@@ -1,0 +1,13 @@
+#+title: MEVIL: Minimal Edge Vertex Instruction Language
+
+This is the compiler for the Minimal Edge Vertex Instruction Language (MIVIL),
+
+MEVIL (MEH-vehl) is a reduced-power graph instruction language, a domain specific language for creating random graph generators. In short a MEVIL program describes how a random graph should be generated.
+The language relies on Lindenmayer Systems, a form of parallel rewriting system for its formal guarantees about correctness and labelling.
+
+The v.1 of the compiler is being written in go. The purpose of the language is to act as a reproducibility and audit intermediary for random graph projects that involve Lindenmayer Systems.
+
+The principal researcher intends to extend the language in the future to build from Isabelle/HOL theorems that describe a Lindenmayer System to generate graphs.
+
+* The TODO list
+- initial language definition + parser

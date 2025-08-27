@@ -1,0 +1,44 @@
+METADATA {
+    name = "always hamiltonian";
+    description ="produces a graph which always contains a hamiltonian cycle";
+    seed = 123123; // Some seed for the randomness generator
+}
+
+prim integer k = input a1;
+
+prim ALPHABET alphabet = A,L;
+prim PARAMS formal_parameters = x,y;
+prim AXIOM omega = A(1,recall k);
+
+prim PRODUCTIONS cycle_productions =
+     rule_1: A(x,y) : x < y -> L(x+1)A(x)A(x+1,y),
+     rule_2: A(x,y) : x = y -> L(1)A(x);
+
+prim PRODUCTIONS complete_productions =
+     rule_1: A(x,y) : x < y -> L(x+1,y)A(x)A(x+1,y),
+     rule_2: L(x,y) : x = y -> L(x)L(x+1,y);
+
+prim GENERATOR cycle = system(alphabet,formal_parameters,omega,cycle_productions);
+prim GENERATOR complete = system(alphabet,formal_parameters,omega,complete_productions);
+
+complete validate invariant SUB_GRAPH cycle;
+
+prim PRODUCTIONS hamiltonian_productions = infer_productions(cycle_productions,complete_productions);
+prim GENERATOR hamiltonian_trail = system(alphabet,formal_parameters,omega.hamiltonian_productions);
+
+hamiltonian_trail{
+set VERTEX A a1;
+set EDGE L a1;
+set Y 0;
+on VERTEX {
+set Y a1;
+};
+on EDGE {
+set matrix a1 Y;
+};
+on PARSER {
+   lommuto;
+};
+}
+
+return hamiltonian_trail;
