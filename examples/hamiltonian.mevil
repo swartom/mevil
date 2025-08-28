@@ -1,8 +1,8 @@
 METADATA {
-    name = "always hamiltonian";
-    description ="produces a graph which always contains a hamiltonian cycle";
-    seed = 123123; // Some seed for the randomness generator
-}
+    string name = "always hamiltonian";
+    string description ="produces a graph which always contains a hamiltonian cycle";
+    integer seed = 123123; // Some seed for the randomness generator
+};
 
 prim integer k = input a1;
 
@@ -23,7 +23,7 @@ prim GENERATOR complete = system(alphabet,formal_parameters,omega,complete_produ
 
 complete validate invariant SUB_GRAPH cycle;
 
-prim PRODUCTIONS hamiltonian_productions = infer_productions(cycle_productions,complete_productions);
+prim PRODUCTIONS hamiltonian_productions = infer(cycle_productions,complete_productions);
 prim GENERATOR hamiltonian_trail = system(alphabet,formal_parameters,omega.hamiltonian_productions);
 
 hamiltonian_trail{
@@ -39,6 +39,6 @@ set matrix a1 Y;
 on PARSER {
    lommuto;
 };
-}
+};
 
-return hamiltonian_trail;
+return hamiltonian_trail matrix;

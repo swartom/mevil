@@ -1,0 +1,31 @@
+<comment> ::= //*\n
+
+
+<statement> ::= <metadata>|<primitive>|<variable>|<return>|<comment><statement>
+<statementlist> ::= <statement>;<statementlist>|<statement>
+<program> ::= <statementlist>;
+
+<logic> ::= +|-|/|%|*|^
+<logiclist> ::= <parameter><logic><logiclist>|<parameter>
+<anonymousfunction> ::=
+<function> ::= VARIABLE(<parameterlist>)|def VARIABLE(<parameterlist>) {<statementlist>}|<anonymousfunction>
+
+
+
+<parameter>     ::= INTEGER|VARIABLE|<function>
+<parameterlist> ::= <parameter>,<parameterlist>|<parameter>
+<module>        ::= <letter>(<parameterlist>)
+<modulelist>    ::= <modulelist><module>|<module>
+
+<conditional> ::= <condition> and <contional>|<condition> or <contional>
+
+<string>  ::= STRING
+<integer> ::= INTEGER
+<rule>    ::= VARIABLE : <module> : <conditional> -> <modulelist>
+<item> ::= STRING|INTEGER|<list>|<rule>
+
+<type> ::= STRING|INTEGER|LIST|RULE|PROPERTY|ALPHABET|PARAMS|AXIOM|PRODUCTIONS
+<assignment>     ::= <type> <name> = <item>
+<itemlist> ::= <item>,<itemlist>|<item>
+
+<metadata> ::= {<itemlist>}

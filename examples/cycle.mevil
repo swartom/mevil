@@ -1,8 +1,8 @@
 // Set of Primitive definitions about the
 // Particular Generator
 METADATA {
-name = "cycle"; // Name of the generator
-description = "Generates the k-cycle for a given k as an input";
+string name = "cycle"; // Name of the generator
+string description = "Generates the k-cycle for a given k as an input";
 }
 
 prim PROPERTY halting = invariant HALT; // Check if the language is decidable
@@ -37,4 +37,4 @@ set matrix a1 Y;
 };
 
 // Build the returning language
-return cycle;
+return cycle matrix; // Explicitly state the output you want matrix or string
