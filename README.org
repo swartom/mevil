@@ -9,12 +9,10 @@ MEVIL (MEH-vehl) is a domain specific reduced-power graph instruction language, 
 The language relies on Lindenmayer Systems, a form of parallel rewriting system for its formal guarantees about correctness and labelling. A MEVIL program is designed to be a slot-in binary program you can call. That when fully developed will guarentee the following,
 - Always has $\mathcal{O}(n)$ linear / $\mathcal{O}(\log n)$ sublinear computational complexity and will tell you if it doesn't.
 - Particular invariant properties, such as always containing a specified graph.
-- Automatically take a maximal mimimal space and generate random graphs within it.
+- Automatically take a maximal minimal space and generate random graphs within it.
 - Provide a formal proof in the Isar programming language for a graph to be checked externally.
 
 The v.1 of the compiler is being written in go. The purpose of the language is to act as a reproducibility and audit intermediary for random graph projects that involve Lindenmayer Systems.
-
-The principal researcher intends to extend the language in the future to build from Isabelle/HOL theorems that describe a Lindenmayer System to generate graphs.
 
 * The TODO list
 - initial language definition + parser
