@@ -1,5 +1,5 @@
 /*
-Copyright © 2025 NAME HERE t.swarbrick@lancaster.ac.uk
+Copyright © 2025 Thomas Swarbrick t.swarbrick@lancaster.ac.uk
 */
 package main
 

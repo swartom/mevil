@@ -1,5 +1,8 @@
 #+title: MEVIL: Minimal Edge Vertex Instruction Language
 
+
+[[./mevil_logo.svg]]
+
 This is the compiler for the Minimal Edge Vertex Instruction Language (MEVIL),
 
 MEVIL (MEH-vehl) is a reduced-power graph instruction language, a domain specific language for creating random graph generators. In short a MEVIL program describes how a random graph should be generated.

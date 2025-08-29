@@ -15,9 +15,18 @@ var tokenizerCmd = &cobra.Command{
 	Short: "The tokenisation transcript for a MEVIL program",
 	Long:  `This is the tokeniser output to the terminal for the stack tree from a pushdown recogniser`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("tokenizer called")
+
+		fmt.Println("Tokenising %s", args[0])
 	},
 }
+
+
+func OpenFile() {
+
+}
+
+
+
 
 func init() {
 	rootCmd.AddCommand(tokenizerCmd)
