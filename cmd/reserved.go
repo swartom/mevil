@@ -1,9 +1,5 @@
-package main
+package cmd
 
-import (
+import ()
 
-)
-
-const (
-
-)
+const ()
