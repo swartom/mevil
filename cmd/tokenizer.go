@@ -9,7 +9,12 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
+
 	"strings"
+)
+
+const (
+	PRIMITIVE_TEXT = "prim"
 )
 
 // tokenizerCmd represents the tokenizer command
@@ -23,8 +28,34 @@ var tokenizerCmd = &cobra.Command{
 		if file := OpenFile(args[0]); file != nil {
 
 			// Takes a given file, creates a reader wrapper and passes it to the scanner function
-			scanner := bufio.NewScanner(string.NewReader(file))
+			scanner := bufio.NewScanner(file)
+			split := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+				advance, token, err = bufio.ScanWords(data, atEOF)
+				// check for comment
+				if string(token) == `//` {
+					comment := []byte(strings.Split(string(data[1:]), "\n")[0])
+					commentlength := len(comment)
+					advance = commentlength + 1
+					// If we have a comment read the next token
+					var nextTokenAdvance int
+					nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
+					advance = advance + nextTokenAdvance
+				}
 
+				switch string(token) {
+				case PRIMITIVE_TEXT:
+					log.Println("primtive text")
+				default:
+					log.Println("non primitive")
+				}
+
+				return
+			}
+			scanner.Split(split)
+
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+			}
 		}
 	},
 }
@@ -141,6 +172,11 @@ func OpenFile(filename string) *os.File {
 	return nil
 
 }
+
+// The First pass of the tokenizer takes in a file and removes comments
+// And segments the file into its two constituent components Primitives and Properties.
+// Primitives are some assigment or operation that needs to be taken into accoutn
+// Properties are something that has to be parsed by the system.
 
 func init() {
 	rootCmd.AddCommand(tokenizerCmd)
