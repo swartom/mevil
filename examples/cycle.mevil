@@ -3,7 +3,7 @@
 METADATA {
 string name = "cycle"; // Name of the generator
 string description = "Generates the k-cycle for a given k as an input";
-}
+};
 
 prim PROPERTY halting = invariant HALT; // Check if the language is decidable
 prim PROPERTY fixed_memory_space = invariant MEMORYSPACE_FIXED; // Check that the maximum memory taken, even when stochastic, is fixed

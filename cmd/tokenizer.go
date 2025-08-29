@@ -67,7 +67,7 @@ type TokenList[T TokenTypes] interface {
 // It effectively acts as a switch flow controller because
 // go won't let me implement this under its rather restrictive type system.
 
-//*
+// *
 // * Type
 // |8|7|6|5|4|3|2|1|
 // |---------------|
@@ -75,27 +75,36 @@ type TokenList[T TokenTypes] interface {
 // LE - as Little Endian
 // 1. isList (Important for if the parser needs to loop on all the next states)
 // 2-3. abstract primitive type class where,
-// 	00: Module
-// 	01: int64
-// 	10: string
-// 	11: float64
+//
+//	00: Module
+//	01: int64
+//	10: string
+//	11: float64
+//
 // 4-5: prediction of future classes, i.e. what does the parser think this?
-//  00: primitive list
-//  01: rule
-//  10: GENERATOR
-//  11: validation and setup
+//
+//	00: primitive list
+//	01: rule
+//	10: GENERATOR
+//	11: validation and setup
+//
 // 6-7:
-//  reserved
+//
+//	reserved
+//
 // */
 type Token struct {
 	Type uint8
 	V    string
 }
 
-/* Evaluates the string against the reserved words dictionary
-   Computes in O(1) due to preloading the dictionary into memory and lookup
+/*
+Evaluates the string against the reserved words dictionary
 
-   **/
+	Computes in O(1) due to preloading the dictionary into memory and lookup
+
+	*
+*/
 func EvaluateForReservedWords(word string) {
 
 }
@@ -106,10 +115,7 @@ func (T *Token) classify() {
 
 func (T *Token) ClassifyTokenType() uint8 {
 	T.classify()
-	switch T.V {
-	case:
-
-	}
+	return 0
 }
 
 // func (T *Token) WrapInMonad() AbstractMonadicToken {
@@ -120,9 +126,9 @@ func (T *Token) ClassifyTokenType() uint8 {
 
 // Object for the tokeniser,
 type Tokenizer struct {
-	file   *os.File   // The file being read from
-	AbstractVariableSpace chan Token[string] // Assigned Variable Namespaces
-
+	file       *os.File    // The file being read from
+	Primitives chan string // Assigned Variable Namespaces
+	Properties chan string // Properties
 }
 
 func OpenFile(filename string) *os.File {
