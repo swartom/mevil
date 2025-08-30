@@ -17,6 +17,26 @@ const (
 	PRIMITIVE_TEXT = "prim"
 )
 
+/**
+ * Removes comments automatically from the tokenizer before
+ * the tokenization process as a preprocessing action */
+func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if advance, token, err = bufio.ScanWords(data, atEOF); err == nil {
+		// check for comment
+		for string(token) == `//` {
+			comment := []byte(strings.Split(string(data[advance:]), "\n")[0])
+			commentlength := len(comment)
+			advance = advance + commentlength
+			// If we have a comment read the next token
+			var nextTokenAdvance int
+			nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
+			advance = advance + nextTokenAdvance
+			log.Println("comment", string(comment))
+		}
+	}
+	return
+}
+
 // tokenizerCmd represents the tokenizer command
 var tokenizerCmd = &cobra.Command{
 	Use:   "tokenizer",
@@ -26,140 +46,15 @@ var tokenizerCmd = &cobra.Command{
 
 		fmt.Printf("Tokenising: %s\n", args[0])
 		if file := OpenFile(args[0]); file != nil {
-
 			// Takes a given file, creates a reader wrapper and passes it to the scanner function
 			scanner := bufio.NewScanner(file)
-			split := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-				advance, token, err = bufio.ScanWords(data, atEOF)
-				// check for comment
-				if string(token) == `//` {
-					comment := []byte(strings.Split(string(data[1:]), "\n")[0])
-					commentlength := len(comment)
-					advance = commentlength + 1
-					// If we have a comment read the next token
-					var nextTokenAdvance int
-					nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
-					advance = advance + nextTokenAdvance
-				}
 
-				switch string(token) {
-				case PRIMITIVE_TEXT:
-					log.Println("primtive text")
-				default:
-					log.Println("non primitive")
-				}
-
-				return
-			}
-			scanner.Split(split)
-
+			scanner.Split(GetTokenSkipComments)
 			for scanner.Scan() {
 				fmt.Println(scanner.Text())
 			}
 		}
 	},
-}
-
-// Take the scanner and create a whole tokenizer for the language,
-// - Convert reserved words to identifier objects
-
-type ReservedLookup struct {
-	Marker int64
-}
-
-type ReservedWord interface {
-	int64
-}
-
-type Module struct {
-	Letter     uint8
-	Parameters []uint64
-}
-
-type Conditional struct {
-	LHS     string
-	operand uint8
-	RHS     string
-}
-
-type TokenTypes interface {
-	int64 |
-		string |
-		float64 |
-		Module
-}
-
-// List of tokens, wrapped in a monadic structure to parse as a single item in the stream channel
-type TokenList[T TokenTypes] interface {
-	[]T
-}
-
-// Type uint8 is a overloaded abstract monad classifier,
-// It effectively acts as a switch flow controller because
-// go won't let me implement this under its rather restrictive type system.
-
-// *
-// * Type
-// |8|7|6|5|4|3|2|1|
-// |---------------|
-// |0|1|0|1|0|1|0|1|
-// LE - as Little Endian
-// 1. isList (Important for if the parser needs to loop on all the next states)
-// 2-3. abstract primitive type class where,
-//
-//	00: Module
-//	01: int64
-//	10: string
-//	11: float64
-//
-// 4-5: prediction of future classes, i.e. what does the parser think this?
-//
-//	00: primitive list
-//	01: rule
-//	10: GENERATOR
-//	11: validation and setup
-//
-// 6-7:
-//
-//	reserved
-//
-// */
-type Token struct {
-	Type uint8
-	V    string
-}
-
-/*
-Evaluates the string against the reserved words dictionary
-
-	Computes in O(1) due to preloading the dictionary into memory and lookup
-
-	*
-*/
-func EvaluateForReservedWords(word string) {
-
-}
-
-func (T *Token) classify() {
-	EvaluateForReservedWords(T.V)
-}
-
-func (T *Token) ClassifyTokenType() uint8 {
-	T.classify()
-	return 0
-}
-
-// func (T *Token) WrapInMonad() AbstractMonadicToken {
-
-// }
-
-// All the parseable types of tokens in the token stream
-
-// Object for the tokeniser,
-type Tokenizer struct {
-	file       *os.File    // The file being read from
-	Primitives chan string // Assigned Variable Namespaces
-	Properties chan string // Properties
 }
 
 func OpenFile(filename string) *os.File {
