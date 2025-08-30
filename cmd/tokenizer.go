@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PRIMITIVE_TEXT = "prim"
+	CONTROL_FLOW_CHARACTERS = `(){}<>,?/;:-=\"'@~¬[]`
 )
 
 /**
@@ -23,16 +23,49 @@ const (
 func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if advance, token, err = bufio.ScanWords(data, atEOF); err == nil {
 		// check for comment
+		var nextTokenAdvance int
 		for string(token) == `//` {
 			comment := []byte(strings.Split(string(data[advance:]), "\n")[0])
 			commentlength := len(comment)
 			advance = advance + commentlength
 			// If we have a comment read the next token
-			var nextTokenAdvance int
 			nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
 			advance = advance + nextTokenAdvance
-			log.Println("comment", string(comment))
 		}
+
+		// Special cases, i.e. quotes, commas, brackets, and semi-colons
+		//run split on all of these characters, if length is
+		// greater than one then we need to shorten the word/token
+		// All of these also need to be parsed separately..
+		// Check each letter sequentially for the character,
+		// at worst case O(n)
+
+		var halt bool
+
+		var char rune
+		var index int
+		/* Bit dodgy but separates in an efficient-ish manner */
+		for i, letter := range token {
+			if !halt { // Continue until you find a given conditional
+				// The control flow characters
+				for _, char = range CONTROL_FLOW_CHARACTERS { // Fixed Complexity of arbitrary |CONTROL_FLOW_CHARACTERS|
+					if rune(letter) == char {
+						halt = true
+						index = i
+						break
+					}
+				}
+			} else {
+				break
+			}
+		}
+		if halt {
+			// If we didn't exhaustively enumerate through all elements, then we halted and found a flow element at some index i
+			// We then break the token and reduce the advance to this point,
+			log.Println(string(token), len(token), advance, index)
+
+		}
+
 	}
 	return
 }
@@ -52,6 +85,7 @@ var tokenizerCmd = &cobra.Command{
 			scanner.Split(GetTokenSkipComments)
 			for scanner.Scan() {
 				fmt.Println(scanner.Text())
+
 			}
 		}
 	},
