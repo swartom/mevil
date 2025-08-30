@@ -23,26 +23,19 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 	length := len(data)
 	if !atEOF {
 		var halt bool
+		var start_index = 0
 		var start bool = true
-		var incomment bool = false
+
 		for !halt { // Continue until you find a given conditional
 			// The control flow characters
 			if advance < length {
 				letter := rune(data[advance])
-				if start && string(letter) == ` ` {
+				if start && (string(letter) == ` `) {
+					start_index += 1
 					advance += 1
-				} else if start && (string(letter) == `/` || incomment) {
-					incomment = true
-
-					if string(data[advance]) == "\n" {
-						incomment = false
-
-					} else {
-						advance += 1
-					}
 				} else {
 					start = false
-					for _, char := range CONTROL_FLOW_CHARACTERS { // Fixed Complexity of arbitrary |CONTROL_FLOW_CHARACTERS|
+					for _, char := range CONTROL_FLOW_CHARACTERS {
 						if rune(letter) == char {
 							halt = true
 							break
@@ -57,7 +50,7 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 		if advance != 1 {
 			advance = advance - 1
 		}
-		token = []byte(strings.TrimSpace(string(data[:advance])))
+		token = []byte(strings.TrimSpace(string(data[start_index:advance])))
 		log.Println(token)
 	} // If the token is a // then remove all to next line character,
 
