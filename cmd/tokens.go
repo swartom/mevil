@@ -1,8 +1,8 @@
-package main
+package cmd
 
 type Kind string
 
 // tr
 const (
-	EOF
+	EOF Kind = "eof"
 )

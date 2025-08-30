@@ -32,7 +32,7 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 			nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
 			advance = advance + nextTokenAdvance
 		}
-
+		advance = advance - nextTokenAdvance
 		// Special cases, i.e. quotes, commas, brackets, and semi-colons
 		//run split on all of these characters, if length is
 		// greater than one then we need to shorten the word/token
@@ -60,11 +60,12 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 			}
 		}
 		if halt {
-			// If we didn't exhaustively enumerate through all elements, then we halted and found a flow element at some index i
-			// We then break the token and reduce the advance to this point,
-			log.Println(string(token), len(token), advance, index)
-
+			if index == 0 {
+				log.Println(string(char))
+			}
 		}
+
+		advance = advance + nextTokenAdvance
 
 	}
 	return
