@@ -9,65 +9,47 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
-
 	"strings"
 )
 
 const (
-	CONTROL_FLOW_CHARACTERS = `(){}<>,?/;:-=\"'@~¬[]`
+	CONTROL_FLOW_CHARACTERS = ` (){}<>,?;:-=\"'@~¬[]`
 )
 
 /**
  * Removes comments automatically from the tokenizer before
  * the tokenization process as a preprocessing action */
 func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if advance, token, err = bufio.ScanWords(data, atEOF); err == nil {
-		// check for comment
-		var nextTokenAdvance int
-		for string(token) == `//` {
-			comment := []byte(strings.Split(string(data[advance:]), "\n")[0])
-			commentlength := len(comment)
-			advance = advance + commentlength
-			// If we have a comment read the next token
-			nextTokenAdvance, token, err = bufio.ScanWords(data[advance:], atEOF)
-			advance = advance + nextTokenAdvance
-		}
-		advance = advance - nextTokenAdvance
-		// Special cases, i.e. quotes, commas, brackets, and semi-colons
-		//run split on all of these characters, if length is
-		// greater than one then we need to shorten the word/token
-		// All of these also need to be parsed separately..
-		// Check each letter sequentially for the character,
-		// at worst case O(n)
-
+	length := len(data)
+	if !atEOF {
 		var halt bool
 
-		var char rune
-		var index int
-		/* Bit dodgy but separates in an efficient-ish manner */
-		for i, letter := range token {
-			if !halt { // Continue until you find a given conditional
-				// The control flow characters
-				for _, char = range CONTROL_FLOW_CHARACTERS { // Fixed Complexity of arbitrary |CONTROL_FLOW_CHARACTERS|
+		for !halt { // Continue until you find a given conditional
+			// The control flow characters
+			if advance < length {
+				letter := rune(data[advance])
+				for _, char := range CONTROL_FLOW_CHARACTERS { // Fixed Complexity of arbitrary |CONTROL_FLOW_CHARACTERS|
 					if rune(letter) == char {
 						halt = true
-						index = i
+						if string(letter) == ` ` || string(letter) == "\n" {
+							advance += 1
+						}
+
 						break
 					}
 				}
+				advance += 1
 			} else {
-				break
+				halt = true
 			}
 		}
-		if halt {
-			if index == 0 {
-				log.Println(string(char))
-			}
+		if advance != 1 {
+			advance = advance - 1
 		}
-
-		advance = advance + nextTokenAdvance
+		token = []byte(strings.TrimSpace(string(data[:advance])))
 
 	}
+
 	return
 }
 
