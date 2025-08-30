@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	CONTROL_FLOW_CHARACTERS = ` (){}<>,?;:-=\"'@~¬[]`
+	CONTROL_FLOW_CHARACTERS = ` (){}<>,?;:-=\"'@~¬[]/+`
 )
 
 /**
@@ -30,8 +30,7 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 			// The control flow characters
 			if advance < length {
 				letter := rune(data[advance])
-				if start && (string(letter) == ` `) {
-					start_index += 1
+				if start && (letter == ' ' || letter == '\n') {
 					advance += 1
 				} else {
 					start = false

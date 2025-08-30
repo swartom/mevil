@@ -1,21 +1,18 @@
-// Set of Primitive definitions about the
-// Particular Generator
 METADATA {
 string name = "cycle"; // Name of the generator
 string description = "Generates the k-cycle for a given k as an input";
 };
 
-prim PROPERTY halting = invariant HALT; // Check if the language is decidable
-prim PROPERTY fixed_memory_space = invariant MEMORYSPACE_FIXED; // Check that the maximum memory taken, even when stochastic, is fixed
+prim PROPERTY halting = invariant HALT;
+prim PROPERTY fixed_memory_space = invariant MEMORYSPACE_FIXED;
+prim integer k = input a1;
 
-prim integer k = input a1; // bind a given argument input (a1,a2,a3) etc. to a immutable variable
 
-// Define the alphabet of the language
 prim ALPHABET alphabet = A,L;
 prim PARAMS formal_parameters = x,y;
 prim AXIOM omega = A(1,recall k);
 
-// Parser Productions
+
 prim PRODUCTIONS p =
      rule_1: A(x,y) : x < y -> L(x+1)A(x)A(x+1,y),
      rule_2: A(x,y) : x = y -> L(1)A(x);
@@ -36,5 +33,4 @@ on EDGE {
 set matrix a1 Y;
 };
 
-// Build the returning language test
-return cycle matrix;  // Explicitly state the output you want matrix or string
+return cycle matrix;
