@@ -4,11 +4,25 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bufio"
 	"fmt"
-	// "bufio"
 	// "os"
 	"github.com/spf13/cobra"
 )
+
+// LR(1) Parser
+type Parser struct {
+	scanner bufio.Scanner
+
+	current   Token
+	nextToken Token
+}
+
+func (p *Parser) Next() {
+	p.scanner.Scan()
+	p.current = p.nextToken
+	Classify(p.scanner.Text(), &p.nextToken)
+}
 
 // lexerCmd represents the lexer command
 var lexerCmd = &cobra.Command{
