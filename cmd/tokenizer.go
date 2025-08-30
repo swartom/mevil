@@ -23,14 +23,13 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 	length := len(data)
 	if !atEOF {
 		var halt bool
-		var start_index = 0
 		var start bool = true
 
 		for !halt { // Continue until you find a given conditional
 			// The control flow characters
 			if advance < length {
 				letter := rune(data[advance])
-				if start && (letter == ' ' || letter == '\n') {
+				if start && (letter == ' ' || letter == '\n' || letter == '\t') {
 					advance += 1
 				} else {
 					start = false
@@ -49,8 +48,8 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 		if advance != 1 {
 			advance = advance - 1
 		}
-		token = []byte(strings.TrimSpace(string(data[start_index:advance])))
-		log.Println(token)
+		token = []byte(strings.TrimSpace(string(data[0:advance])))
+		log.Println(strings.TrimSpace(string(data[0:advance])))
 	} // If the token is a // then remove all to next line character,
 
 	return

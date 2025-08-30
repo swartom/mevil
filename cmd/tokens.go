@@ -2,7 +2,13 @@ package cmd
 
 type Kind string
 
-// tr
+// Overloaded Kind of variable type string
 const (
-	EOF Kind = "eof"
+	EOF                  Kind = ""
+	RESERVED_WORD_STRING Kind = "string"
 )
+
+type Token struct {
+	Kind  Kind
+	Value string
+}

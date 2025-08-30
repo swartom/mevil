@@ -23,14 +23,15 @@ cycle validate halting;
 cycle validate fixed_memory_space;
 
 cycle{
-set VERTEX A a1;
-set EDGE L a1;
-set Y 0;
-on VERTEX {
-set Y a1;
-};
-on EDGE {
-set matrix a1 Y;
+    set VERTEX A a1;
+    set EDGE L a1;
+    set Y 0;
+    on VERTEX {
+        set Y a1;
+    };
+    on EDGE {
+        set matrix a1 Y;
+    };
 };
 
 return cycle matrix;
