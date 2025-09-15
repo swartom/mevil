@@ -12,39 +12,37 @@ import (
 )
 
 type Block struct {
-	Letter   rune
-	X        int
-	Y        int
+	Letter   uint8
+	X        uint16
+	Y        uint16
 	Previous *Block
 }
 
 var wg sync.WaitGroup
-var lim = 1
+var lim uint16 = 1
 
-func (b *Block) RunRule() (list []*Block) {
+func (b *Block) RunRule() {
 	EndBlock := b.Previous
 
 	switch b.Letter {
 	case 'A':
 		if b.Y < lim {
-
-			c := make([]Block, 1)
-			c[0].Letter = 'A'
-			c[0].Previous = EndBlock
-			c[0].X = int(math.Pow(2, float64(b.Y))) + b.X
-			c[0].Y = b.Y + 1
+			c := new(Block)
+			c.Letter = 'A'
+			c.Previous = EndBlock
+			c.X = uint16(math.Pow(2, float64(b.Y))) + b.X
+			c.Y = b.Y + 1
 			b.Y = b.Y + 1
-			b.Previous = &c[0]
+			b.Previous = c
 
 			wg.Add(1)
-			go c[0].RunRule()
+			go c.RunRule()
 
 			b.RunRule()
 		} else {
 			wg.Done()
 		}
 	}
-	return list
 }
 
 type BlockList = *[]Block
@@ -76,8 +74,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for i := range 25 {
-			lim = i
+		for i := range 30 {
+			lim = uint16(i)
 
 			data := Block{
 				Letter:   'A',
