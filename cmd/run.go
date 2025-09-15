@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"gonum.org/v1/gonum/stat/distuv"
 	"log"
 	"math"
 	"strconv"
@@ -12,15 +13,20 @@ import (
 	"time"
 )
 
+var beta_distro distuv.Beta = distuv.Beta{
+	Alpha: 7.5, //7.5,
+	Beta:  .5,  //.5,
+}
+
 type Block struct {
 	Letter   uint8
-	X        uint16
-	Y        uint16
+	X        uint32
+	Y        uint32
 	Previous *Block
 }
 
 var wg sync.WaitGroup
-var lim uint16 = 1
+var lim uint32 = 1
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
@@ -31,7 +37,13 @@ func (b *Block) RunRule() {
 			c := new(Block)
 			c.Letter = 'A'
 			c.Previous = EndBlock
-			c.X = uint16(math.Pow(2, float64(b.Y))) + b.X
+			// c.X = 1
+			q := beta_distro.Rand()
+			r := beta_distro.Rand()
+			s := beta_distro.Rand()
+			// fmt.Sprintf("%d%d%d", q, r, s)
+			q = r + s + q
+			c.X = uint32(math.Pow(2, float64(b.Y))) + b.X
 			c.Y = b.Y + 1
 			b.Y = b.Y + 1
 			b.Previous = c
@@ -50,12 +62,12 @@ func (b *Block) RunRule() {
 }
 
 func PrintList(block *Block) int {
-	log.Printf("%+v", block)
+	// log.Printf("%+v", block)
 	current := block.Previous
 	var count int
 	for current != nil {
 		count = count + 1
-
+		// log.Printf("%+v", current)
 		current = current.Previous
 	}
 	return count
@@ -74,7 +86,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		i, _ := strconv.Atoi(args[0])
 		{
-			lim = uint16(i)
+			lim = uint32(i)
 
 			data := Block{
 				Letter:   'A',
