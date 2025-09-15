@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"math"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -74,7 +75,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		i := 28
+		i, _ := strconv.Atoi(args[0])
 		{
 			lim = uint16(i)
 
