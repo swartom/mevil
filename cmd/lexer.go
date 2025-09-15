@@ -10,19 +10,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// LR(1) Parser
-type Parser struct {
-	scanner bufio.Scanner
+// func (p *Parser) Next() {
+// 	p.scanner.Scan()
+// 	p.current = p.nextToken
+// 	Classify(p.scanner.Text(), &p.nextToken)
+// }
 
-	current   Token
-	nextToken Token
-}
-
-func (p *Parser) Next() {
-	p.scanner.Scan()
-	p.current = p.nextToken
-	Classify(p.scanner.Text(), &p.nextToken)
-}
+const (
+	IDENTIIFER int = iota // Name assigned by a programmer
+	KEYWORD    int = iota
+	SEPARATOR  int = iota
+	OPERATOR   int = iota
+	LITERAL    int = iota
+)
 
 // lexerCmd represents the lexer command
 var lexerCmd = &cobra.Command{
@@ -35,17 +35,19 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("lexer called")
+		fmt.Printf("Lexing: %s\n", args[0])
+		if file := OpenFile(args[0]); file != nil {
+			// Takes a given file, creates a reader wrapper and passes it to the scanner function
+			scanner := bufio.NewScanner(file)
 
-		// scanner := bufio.NewScanner(file)
+			scanner.Split(GetTokenSkipComments)
+			for scanner.Scan() {
 
-		// scanner.Split(GetTokenSkipComments)
-		// for scanner.Scan() {
-		// 	switch scanner.Text() {
-		// 	case
-		// 	}
-		// }
+				// Categorise token and push to a channel
+				scanner.Text()
 
+			}
+		}
 	},
 }
 

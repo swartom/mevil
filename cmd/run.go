@@ -1,14 +1,49 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"log"
+	"time"
 )
+
+type Block struct {
+	Letter   rune
+	X        int
+	Y        int
+	Previous *Block
+}
+
+func (b *Block) RunRule() (list []*Block) {
+	EndBlock := b.Previous
+
+	switch b.Letter {
+	case 'A':
+		if b.X != b.Y {
+			c := make([]Block, 1)
+			c[0].Previous = EndBlock
+			c[0].X = b.X * 2
+			b.Previous = &c[0]
+			list = append(list, b)
+			list = append(list, &c[0])
+
+		}
+	}
+	return list
+}
+
+type BlockList = *[]Block
+
+func PrintList(block *Block) {
+	log.Printf("%+v", block)
+	current := block.Previous
+	for current != nil {
+		log.Printf("%+v", current)
+		current = current.Previous
+	}
+}
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
@@ -21,7 +56,19 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run called")
+		data := Block{
+			Letter:   'A',
+			X:        1,
+			Y:        10,
+			Previous: nil,
+		}
+		start := time.Now()
+		var list []*Block
+		list = append(list, &data)
+		for _ = range 1_000_000_000 {
+			list = list[0].RunRule()
+		}
+		log.Println(time.Since(start))
 	},
 }
 

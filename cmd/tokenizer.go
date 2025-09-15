@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"github.com/spf13/cobra"
 	"log"
@@ -16,11 +18,25 @@ const (
 	CONTROL_FLOW_CHARACTERS = ` (){}<>,?;:-=\"'@~¬[]/+`
 )
 
+const ()
+
+type UnprocessedToken struct {
+	FlowType int
+	Data     string
+}
+
 /**
  * Removes comments automatically from the tokenizer before
  * the tokenization process as a preprocessing action */
+
+var (
+	buffer bytes.Buffer
+	enc    = gob.NewEncoder(&buffer)
+)
+
 func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	length := len(data)
+
 	if !atEOF {
 		var halt bool
 		var start bool = true
@@ -36,6 +52,7 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 					for _, char := range CONTROL_FLOW_CHARACTERS {
 						if rune(letter) == char {
 							halt = true
+
 							break
 						}
 					}
@@ -49,7 +66,6 @@ func GetTokenSkipComments(data []byte, atEOF bool) (advance int, token []byte, e
 			advance = advance - 1
 		}
 		token = []byte(strings.TrimSpace(string(data[0:advance])))
-		log.Println(strings.TrimSpace(string(data[0:advance])))
 	} // If the token is a // then remove all to next line character,
 
 	return
@@ -69,7 +85,8 @@ var tokenizerCmd = &cobra.Command{
 
 			scanner.Split(GetTokenSkipComments)
 			for scanner.Scan() {
-				fmt.Println(scanner.Text())
+
+				scanner.Text()
 
 			}
 		}
