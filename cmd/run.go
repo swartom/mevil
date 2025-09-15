@@ -36,10 +36,13 @@ func (b *Block) RunRule() {
 			b.Y = b.Y + 1
 			b.Previous = c
 
-			wg.Add(1)
-			go c.RunRule()
-
-			b.RunRule()
+			if b.Y < lim {
+				wg.Add(1)
+				go c.RunRule()
+				b.RunRule()
+			} else {
+				wg.Done()
+			}
 		} else {
 			wg.Done()
 		}
