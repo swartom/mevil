@@ -46,12 +46,6 @@ func (b *Block) RunRule() {
 	}
 }
 
-type BlockList = *[]Block
-
-func (b *Block) ScheduleParallelExec() {
-
-}
-
 func PrintList(block *Block) int {
 	log.Printf("%+v", block)
 	current := block.Previous
