@@ -6,6 +6,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"log"
+	"math"
+	"sync"
 	"time"
 )
 
@@ -16,19 +18,30 @@ type Block struct {
 	Previous *Block
 }
 
+var wg sync.WaitGroup
+var lim = 1
+
 func (b *Block) RunRule() (list []*Block) {
 	EndBlock := b.Previous
 
 	switch b.Letter {
 	case 'A':
-		if b.X != b.Y {
-			c := make([]Block, 1)
-			c[0].Previous = EndBlock
-			c[0].X = b.X * 2
-			b.Previous = &c[0]
-			list = append(list, b)
-			list = append(list, &c[0])
+		if b.Y < lim {
 
+			c := make([]Block, 1)
+			c[0].Letter = 'A'
+			c[0].Previous = EndBlock
+			c[0].X = int(math.Pow(2, float64(b.Y))) + b.X
+			c[0].Y = b.Y + 1
+			b.Y = b.Y + 1
+			b.Previous = &c[0]
+
+			wg.Add(1)
+			go c[0].RunRule()
+
+			b.RunRule()
+		} else {
+			wg.Done()
 		}
 	}
 	return list
@@ -36,13 +49,20 @@ func (b *Block) RunRule() (list []*Block) {
 
 type BlockList = *[]Block
 
-func PrintList(block *Block) {
+func (b *Block) ScheduleParallelExec() {
+
+}
+
+func PrintList(block *Block) int {
 	log.Printf("%+v", block)
 	current := block.Previous
+	var count int
 	for current != nil {
-		log.Printf("%+v", current)
+		count = count + 1
+
 		current = current.Previous
 	}
+	return count
 }
 
 // runCmd represents the run command
@@ -56,20 +76,30 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		data := Block{
-			Letter:   'A',
-			X:        1,
-			Y:        10,
-			Previous: nil,
+		for i := range 25 {
+			lim = i
+
+			data := Block{
+				Letter:   'A',
+				X:        1,
+				Y:        0,
+				Previous: nil,
+			}
+			start := time.Now()
+			var list []*Block
+			list = append(list, &data)
+			wg.Add(1)
+			list[0].RunRule()
+			wg.Wait()
+			log.Println(time.Since(start))
+			count := PrintList(list[0])
+			log.Println(i, count)
 		}
-		start := time.Now()
-		var list []*Block
-		list = append(list, &data)
-		for _ = range 1_000_000_000 {
-			list = list[0].RunRule()
-		}
-		log.Println(time.Since(start))
 	},
+}
+
+func LinearLookupParser(*Block) {
+
 }
 
 func init() {
