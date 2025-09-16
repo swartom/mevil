@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/stat/distuv"
 	"log"
-	"math"
+	// "math"
 	"strconv"
 	"sync"
 	"time"
@@ -33,30 +33,31 @@ func (b *Block) RunRule() {
 
 	switch b.Letter {
 	case 'A':
-		if b.Y < lim {
-			c := new(Block)
-			c.Letter = 'A'
-			c.Previous = EndBlock
-			// c.X = 1
-			// q := beta_distro.Rand()
-			// r := beta_distro.Rand()
-			// s := beta_distro.Rand()
+		if b.X != b.Y {
 
-			// fmt.Sprintf("%d%d%d", q, r, s)
-			// q = r + s + q
+			q := beta_distro.Rand()
+			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
 
-			c.X = uint32(math.Pow(2, float64(b.Y))) + b.X
-			c.Y = b.Y + 1
-			b.Y = b.Y + 1
-			b.Previous = c
+			a := new(Block)
+			a.Letter = 'L'
+			a.X = r
 
-			if b.Y < lim {
-				wg.Add(1)
-				go c.RunRule()
-				b.RunRule()
-			} else {
-				wg.Done()
-			}
+			a2 := new(Block)
+			a2.Letter = 'A'
+			a2.X = b.X
+			a2.Y = r - 1
+
+			b.X = r
+			// b.Y = b.Y
+
+			b.Previous = a2
+			a2.Previous = a
+			a.Previous = EndBlock
+
+			wg.Add(1)
+			go a2.RunRule()
+			b.RunRule()
+
 		} else {
 			wg.Done()
 		}
@@ -93,7 +94,7 @@ to quickly create a Cobra application.`,
 			data := Block{
 				Letter:   'A',
 				X:        1,
-				Y:        0,
+				Y:        uint32(i),
 				Previous: nil,
 			}
 			start := time.Now()
