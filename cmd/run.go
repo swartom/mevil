@@ -54,10 +54,19 @@ func (b *Block) RunRule() {
 			a2.Previous = a
 			a.Previous = EndBlock
 
-			wg.Add(1)
-			go a2.RunRule()
-			b.RunRule()
 
+
+			if a2.X != r-1 {
+				wg.Add(1)
+				go a2.RunRule()
+			}
+			if r != b.Y {
+			b.RunRule()
+			} else {
+
+				wg.Done()
+
+			}
 		} else {
 			wg.Done()
 		}
