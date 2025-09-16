@@ -14,8 +14,8 @@ import (
 )
 
 var beta_distro distuv.Beta = distuv.Beta{
-	Alpha: 1,  //7.5,
-	Beta:  .5, //.5,
+	Alpha: 5, //7.5,
+	Beta:  1, //.5,
 }
 
 type Block struct {
@@ -54,14 +54,12 @@ func (b *Block) RunRule() {
 			a2.Previous = a
 			a.Previous = EndBlock
 
-
-
 			if a2.X != r-1 {
 				wg.Add(1)
 				go a2.RunRule()
 			}
 			if r != b.Y {
-			b.RunRule()
+				b.RunRule()
 			} else {
 
 				wg.Done()
