@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/stat/distuv"
 	"log"
-	// "math"
+	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -94,7 +94,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		i, _ := strconv.Atoi(args[0])
+		i1, _ := strconv.Atoi(args[0])
+		i2, _ := strconv.Atoi(args[1])
+		i := int(math.Pow(float64(i1), float64(i2)))
 		{
 			lim = uint32(i)
 
