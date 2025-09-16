@@ -13,9 +13,11 @@ import (
 	"time"
 )
 
-var beta_distro distuv.Beta = distuv.Beta{
-	Alpha: 5, //7.5,
-	Beta:  1, //.5,
+var beta_distro distuv.Uniform = distuv.Uniform{
+	Min: 0,
+	Max: 1,
+	// Alpha: 5, //7.5,
+	// Beta:  1, //.5,
 }
 
 type Block struct {
@@ -38,7 +40,7 @@ func (b *Block) RunRule() {
 			q := beta_distro.Rand()
 			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
 
-			list := make([]Block, 2)
+			list := make([]Block, 3)
 			a := &list[0]
 			a.Letter = 'L'
 			a.X = r
@@ -48,9 +50,14 @@ func (b *Block) RunRule() {
 			a2.X = b.X
 			a2.Y = r - 1
 
+			a3 := &list[2]
+			a3.Letter = 'L'
+			a3.X = r - 1
+
 			b.X = r
 
-			b.Previous = a2
+			b.Previous = a3
+			a3.Previous = a2
 			a2.Previous = a
 			a.Previous = EndBlock
 
