@@ -38,17 +38,17 @@ func (b *Block) RunRule() {
 			q := beta_distro.Rand()
 			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
 
-			a := new(Block)
+			list := make([]Block, 2)
+			a := &list[0]
 			a.Letter = 'L'
 			a.X = r
 
-			a2 := new(Block)
+			a2 := &list[1]
 			a2.Letter = 'A'
 			a2.X = b.X
 			a2.Y = r - 1
 
 			b.X = r
-			// b.Y = b.Y
 
 			b.Previous = a2
 			a2.Previous = a
