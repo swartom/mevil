@@ -38,12 +38,12 @@ func (b *Block) RunRule() {
 			c.Letter = 'A'
 			c.Previous = EndBlock
 			// c.X = 1
-			q := beta_distro.Rand()
-			r := beta_distro.Rand()
-			s := beta_distro.Rand()
+			// q := beta_distro.Rand()
+			// r := beta_distro.Rand()
+			// s := beta_distro.Rand()
 
 			// fmt.Sprintf("%d%d%d", q, r, s)
-			q = r + s + q
+			// q = r + s + q
 
 			c.X = uint32(math.Pow(2, float64(b.Y))) + b.X
 			c.Y = b.Y + 1
