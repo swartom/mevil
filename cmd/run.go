@@ -124,7 +124,7 @@ to quickly create a Cobra application.`,
 	},
 }
 
-func LinearLookupParser(*Block) {
+func LinearLookupParser() {
 
 }
 
