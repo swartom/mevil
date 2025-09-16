@@ -14,8 +14,8 @@ import (
 )
 
 var beta_distro distuv.Beta = distuv.Beta{
-	Alpha: 7.5, //7.5,
-	Beta:  .5,  //.5,
+	Alpha: 1,  //7.5,
+	Beta:  .5, //.5,
 }
 
 type Block struct {
