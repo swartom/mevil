@@ -20,7 +20,7 @@ var beta_distro distuv.Uniform = distuv.Uniform{
 	// Beta:  1, //.5,
 }
 
-type Block struct {
+type Block struct { // Largest Module in the system
 	Letter   uint8
 	X        uint32
 	Y        uint32
@@ -36,7 +36,6 @@ func (b *Block) RunRule() {
 	switch b.Letter {
 	case 'A':
 		if b.X != b.Y {
-
 			q := beta_distro.Rand()
 			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
 

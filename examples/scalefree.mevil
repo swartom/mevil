@@ -1,0 +1,40 @@
+METADATA {
+string name = "scale-free spanning tree";
+string description = "Generates a Scale-free Spanning Tree";
+};
+
+prim integer k = input a1;
+prim float a = input a2;
+prim float b = input a3;
+
+prim distrib S = Beta(a,b);
+
+prim ALPHABET alphabet = A,L;
+prim PARAMS formal_parameters = x,y;
+prim AXIOM omega = A(1,k);
+
+prim PRODUCTIONS p =
+    p_1: A(x,y) : x != y -> L(r)A(x,r-1)A(r,y) {
+        float q = draw S;
+        integer r = q*(y - x) + x + 1;
+    };
+};
+
+prim GENERATOR cycle = system(alphabet,formal_parameters,omega,p);
+
+cycle validate halting;
+cycle validate fixed_memory_space;
+
+cycle{
+    VERTEX A;
+    EDGE L;
+    Y 0;
+    on VERTEX{
+       set Y a1;
+    };
+    on EDGE{
+       set matrix a1 Y;
+    };
+};
+
+return cycle matrix;
