@@ -4,20 +4,22 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"gonum.org/v1/gonum/stat/distuv"
 	"log"
 	"math"
+	"os"
 	"strconv"
 	"sync"
 	"time"
 )
 
-var beta_distro distuv.Uniform = distuv.Uniform{
-	Min: 0,
-	Max: 1,
-	// Alpha: 5, //7.5,
-	// Beta:  1, //.5,
+var beta_distro distuv.Beta = distuv.Beta{
+	// Min: 0,
+	// Max: 1,
+	Alpha: 40, //7.5,
+	Beta:  .5, //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -39,7 +41,7 @@ func (b *Block) RunRule() {
 			q := beta_distro.Rand()
 			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
 
-			list := make([]Block, 2)
+			list := make([]Block, 3)
 			a := &list[0]
 			a.Letter = 'L'
 			a.X = r
@@ -49,14 +51,14 @@ func (b *Block) RunRule() {
 			a2.X = b.X
 			a2.Y = r - 1
 
-			// a3 := &list[2]
-			// a3.Letter = 'L'
-			// a3.X = r - 1
+			a3 := &list[2]
+			a3.Letter = 'L'
+			a3.X = r - 1
 
 			b.X = r
 
-			b.Previous = a2
-			// a3.Previous = a2
+			b.Previous = a3
+			a3.Previous = a2
 			a2.Previous = a
 			a.Previous = EndBlock
 
@@ -119,12 +121,34 @@ to quickly create a Cobra application.`,
 			log.Println(time.Since(start))
 			count := PrintList(list[0])
 			log.Println(i, count)
+			list[0].debugDumpToFile()
 		}
 	},
 }
 
-func LinearLookupParser() {
-
+func (b *Block) debugDumpToFile() {
+	currentblock := b
+	fo, err := os.Create("test.adjlist")
+	if err != nil {
+		panic(err)
+	}
+	separator := " "
+	for currentblock != nil {
+		switch currentblock.Letter {
+		case 'A':
+			separator = "\n"
+		case 'L':
+			separator = " "
+		}
+		if currentblock != b {
+			fo.WriteString(fmt.Sprintf("%s%d", separator, currentblock.X-1))
+		} else {
+			fo.WriteString(fmt.Sprintf("%d", currentblock.X-1))
+		}
+		currentblock = currentblock.Previous
+	}
+	fo.Close()
+	return
 }
 
 func init() {
