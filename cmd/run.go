@@ -18,7 +18,7 @@ import (
 var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
-	Alpha: 40, //7.5,
+	Alpha: 60, //7.5,
 	Beta:  .5, //.5,
 }
 
