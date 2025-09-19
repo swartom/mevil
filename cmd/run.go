@@ -18,8 +18,8 @@ import (
 var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
-	Alpha: 5, //7.5,
-	Beta:  1, //.5,
+	Alpha: 40, //7.5,
+	Beta:  .5, //.5,
 }
 
 type Block struct { // Largest Module in the system
