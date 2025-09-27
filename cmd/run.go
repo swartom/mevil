@@ -19,7 +19,7 @@ var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
 	Alpha: 2,   //7.5,
-	Beta:  0.3, //.5,
+	Beta:  .01, //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -31,7 +31,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections =
+var connections = 40
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
