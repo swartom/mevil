@@ -28,7 +28,7 @@ degree_freq = nx.degree_histogram(g)
 degrees = range(len(degree_freq))
 
 ax2.loglog(degrees, degree_freq,c=".3",marker="x",ms=12,mew=3,lw =0.0)
-fig.suptitle(f'Degree Distribution of Lindenmayer Scale-free/Small-World Model (|V|={g.number_of_nodes():.1e})', fontsize = 35)
+# fig.suptitle(f'Degree Distribution of Lindenmayer Scale-free/Small-World Model (|V|={g.number_of_nodes():.1e})', fontsize = 35)
 ax2.set_xlabel('Degree (Edge Count)',fontsize=30)
 ax2.set_ylabel('Frequency (Number of Vertices)',fontsize=30)
 

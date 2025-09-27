@@ -18,8 +18,8 @@ import (
 var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
-	Alpha: 40, //7.5,
-	Beta:  .5, //.5,
+	Alpha: 2,   //7.5,
+	Beta:  0.3, //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -31,36 +31,50 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
+var connections = 5
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
-
 	switch b.Letter {
 	case 'A':
 		if b.X != b.Y {
-			q := beta_distro.Rand()
-			r := uint32(int(q*float64(b.Y-b.X))) + b.X + 1
+			r := uint32((b.Y-b.X)/2) + b.X + 1
 
-			list := make([]Block, 3)
-			a := &list[0]
-			a.Letter = 'L'
-			a.X = r
-
-			a2 := &list[1]
+			list := make([]Block, connections+1)
+			a2 := &list[connections]
 			a2.Letter = 'A'
 			a2.X = b.X
 			a2.Y = r - 1
 
-			a3 := &list[2]
-			a3.Letter = 'L'
-			a3.X = r - 1
+			var a *Block = a2
+			var vallist []uint32
+			for i := range connections {
+				var value uint32
+				var unique = false
+				for !unique {
+					unique = true
+					q := beta_distro.Rand()
+
+					value = uint32(int(q * float64(lim)))
+
+					for _, j := range vallist {
+						if value == j {
+							unique = false
+							break
+						}
+					}
+				}
+				tmp := &list[i]
+				tmp.Letter = 'L'
+				tmp.X = value
+				tmp.Previous = a
+				a = tmp
+				vallist = append(vallist, value)
+			}
 
 			b.X = r
-
-			b.Previous = a3
-			a3.Previous = a2
-			a2.Previous = a
-			a.Previous = EndBlock
+			b.Previous = a
+			a2.Previous = EndBlock
 
 			if a2.X != r-1 {
 				wg.Add(1)
