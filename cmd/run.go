@@ -19,7 +19,7 @@ var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
 	Alpha: 2,   //7.5,
-	Beta:  .01, //.5,
+	Beta:  .25, //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -31,23 +31,30 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 4
+var connections = 0
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
 	switch b.Letter {
 	case 'A':
 		if b.X != b.Y {
-			r := uint32((b.Y-b.X)/2) + b.X + 1
+			q := beta_distro.Rand()
+			q = q / 1.01
+			// q = .5
+			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
-			list := make([]Block, connections+1)
+			list := make([]Block, connections+1+1)
 			a2 := &list[connections]
 			a2.Letter = 'A'
 			a2.X = b.X
 			a2.Y = r - 1
+			a3 := &list[connections+1]
+			a3.Letter = 'L'
+			a3.X = b.Y
 
 			var a *Block = a2
 			var vallist []uint32
+			vallist = append(vallist, b.Y)
 			for i := range connections {
 				var value uint32
 				var unique = false
@@ -74,8 +81,9 @@ func (b *Block) RunRule() {
 
 			b.X = r
 			b.Previous = a
-			a2.Previous = EndBlock
 
+			a2.Previous = a3
+			a3.Previous = EndBlock
 			if a2.X != r-1 {
 				wg.Add(1)
 				go a2.RunRule()
