@@ -40,10 +40,12 @@ func (b *Block) RunRule() {
 	switch b.Letter {
 	case 'A':
 		if b.D != b.V {
-
-			r1 := uint8(.5*float32((b.V-b.D))) + b.D + 1
-
-			r2 := uint32(.5*float32(b.N-uint32(b.V-r1)-(b.X+uint32(r1-b.D)))) + b.X + uint32(r1-b.D)
+			// Rate of decay of the meta-community
+			var q1 float32 = .5
+			r1 := uint8(q1*float32((b.V-b.D))) + b.D + 1
+			// Sizes of the communities themselves
+			var q2 float32 = .5
+			r2 := uint32(q2*float32(b.N-uint32(b.V-r1)-(b.X+uint32(r1-b.D)))) + b.X + uint32(r1-b.D) // 3 r1s tf + 1 already
 
 			a1 := new(Block)
 
@@ -63,7 +65,11 @@ func (b *Block) RunRule() {
 				wg.Add(1)
 				go a1.RunRule()
 			}
-			b.RunRule()
+			if b.D != b.V {
+				b.RunRule()
+			} else {
+				wg.Done()
+			}
 		} else {
 			wg.Done()
 		}
@@ -161,6 +167,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		i1, _ := strconv.Atoi(args[0])
 		i2, _ := strconv.Atoi(args[1])
+		i3, _ := strconv.Atoi(args[2])
 		i := int(math.Pow(float64(i1), float64(i2)))
 		{
 			lim = uint32(i)
@@ -168,9 +175,9 @@ to quickly create a Cobra application.`,
 			data := Block{
 				Letter:   'A',
 				X:        1,
-				N:        200,
+				N:        lim,
 				D:        1,
-				V:        4,
+				V:        uint8(i3),
 				Previous: nil,
 			}
 			start := time.Now()
