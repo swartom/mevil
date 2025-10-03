@@ -43,9 +43,7 @@ func (b *Block) RunRule() {
 
 			r1 := uint8(.5*float32((b.V-b.D))) + b.D + 1
 
-			r2 := uint32(.5*float32(
-				(b.N-b.X)+uint32((b.D-b.V)),
-			)) + uint32(r1+b.D) + b.X
+			r2 := uint32(.5*float32(b.N-uint32(b.V-r1)-(b.X+uint32(r1-b.D)))) + b.X + uint32(r1-b.D)
 
 			a1 := new(Block)
 
@@ -170,9 +168,9 @@ to quickly create a Cobra application.`,
 			data := Block{
 				Letter:   'A',
 				X:        1,
-				N:        10,
+				N:        200,
 				D:        1,
-				V:        10,
+				V:        4,
 				Previous: nil,
 			}
 			start := time.Now()
