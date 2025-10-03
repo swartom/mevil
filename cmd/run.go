@@ -25,87 +25,126 @@ var beta_distro distuv.Beta = distuv.Beta{
 type Block struct { // Largest Module in the system
 	Letter   uint8
 	X        uint32
-	Y        uint32
+	N        uint32
+	D        uint8
+	V        uint8
 	Previous *Block
 }
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 3
+var connections = 5
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
 	switch b.Letter {
 	case 'A':
-		if b.X != b.Y {
-			q := beta_distro.Rand()
-			q = q / 1.01
-			q = .5
-			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
+		if b.D != b.V {
 
-			list := make([]Block, connections+1+1)
-			a2 := &list[connections]
-			a2.Letter = 'A'
-			a2.X = b.X
-			a2.Y = r - 1
-			a3 := &list[connections+1]
-			a3.Letter = 'L'
-			a3.X = b.Y
+			r1 := uint8(.5*float32((b.V-b.D))) + b.D + 1
 
-			var a *Block = a2
-			var vallist []uint32
-			vallist = append(vallist, b.Y)
-			for i := range connections {
-				var value uint32
-				var unique = false
-				for !unique {
-					unique = true
-					q := beta_distro.Rand()
+			r2 := uint32(.5*float32(
+				(b.N-b.X)+uint32((b.D-b.V)),
+			)) + uint32(r1+b.D) + b.X
 
-					value = uint32(int(q * float64(lim)))
+			a1 := new(Block)
 
-					for _, j := range vallist {
-						if value == j {
-							unique = false
-							break
-						}
-					}
-				}
-				tmp := &list[i]
-				tmp.Letter = 'L'
-				tmp.X = value
-				tmp.Previous = a
-				a = tmp
-				vallist = append(vallist, value)
-			}
+			a1.Letter = 'A'
+			a1.X = b.X
+			a1.N = r2 - 1
+			a1.D = b.D
+			a1.V = r1 - 1
 
-			b.X = r
-			b.Previous = a
+			b.X = r2
+			b.D = r1
 
-			a2.Previous = a3
-			a3.Previous = EndBlock
-			if a2.X != r-1 {
+			b.Previous = a1
+			a1.Previous = EndBlock
+
+			if a1.D != a1.V {
 				wg.Add(1)
-				go a2.RunRule()
+				go a1.RunRule()
 			}
-			if r != b.Y {
-				b.RunRule()
-			} else {
-				wg.Done()
-			}
+			b.RunRule()
 		} else {
 			wg.Done()
 		}
 	}
 }
 
+// func (b *Block) RunRule() {
+// 	EndBlock := b.Previous
+// 	switch b.Letter {
+// 	case 'A':
+// 		if b.X != b.Y {
+// 			q := beta_distro.Rand()
+// 			q = q / 1.01
+// 			q = .5
+// 			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
+
+// 			list := make([]Block, connections+1+1)
+// 			a2 := &list[connections]
+// 			a2.Letter = 'A'
+// 			a2.X = b.X
+// 			a2.Y = r - 1
+// 			a3 := &list[connections+1]
+// 			a3.Letter = 'L'
+// 			a3.X = b.Y
+
+// 			var a *Block = a2
+// 			var vallist []uint32
+// 			vallist = append(vallist, b.Y)
+// 			for i := range connections {
+// 				var value uint32
+// 				var unique = false
+// 				for !unique {
+// 					unique = true
+// 					q := beta_distro.Rand()
+
+// 					value = uint32(int(q * float64(lim)))
+
+// 					for _, j := range vallist {
+// 						if value == j {
+// 							unique = false
+// 							break
+// 						}
+// 					}
+// 				}
+// 				tmp := &list[i]
+// 				tmp.Letter = 'L'
+// 				tmp.X = value
+// 				tmp.Previous = a
+// 				a = tmp
+// 				vallist = append(vallist, value)
+// 			}
+
+// 			b.X = r
+// 			b.Previous = a
+
+// 			a2.Previous = a3
+// 			a3.Previous = EndBlock
+// 			if a2.X != r-1 {
+// 				wg.Add(1)
+// 				go a2.RunRule()
+// 			}
+// 			if r != b.Y {
+// 				b.RunRule()
+// 			} else {
+// 				wg.Done()
+// 			}
+// 		} else {
+// 			wg.Done()
+// 		}
+// 	}
+// }
+
 func PrintList(block *Block) int {
-	// log.Printf("%+v", block)
+	log.Printf("%+v", block)
 	current := block.Previous
 	var count int
 	for current != nil {
 		count = count + 1
-		// log.Printf("%+v", current)
+		log.Printf("%+v", current)
 		current = current.Previous
 	}
 	return count
@@ -131,7 +170,9 @@ to quickly create a Cobra application.`,
 			data := Block{
 				Letter:   'A',
 				X:        1,
-				Y:        uint32(i),
+				N:        10,
+				D:        1,
+				V:        10,
 				Previous: nil,
 			}
 			start := time.Now()
