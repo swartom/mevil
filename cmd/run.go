@@ -31,7 +31,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 0
+var connections = 3
 
 func (b *Block) RunRule() {
 	EndBlock := b.Previous
@@ -40,7 +40,7 @@ func (b *Block) RunRule() {
 		if b.X != b.Y {
 			q := beta_distro.Rand()
 			q = q / 1.01
-			// q = .5
+			q = .5
 			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
 			list := make([]Block, connections+1+1)
