@@ -18,54 +18,125 @@ import (
 var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
-	Alpha: 2,   //7.5,
-	Beta:  .25, //.5,
+	Alpha: 2,    //7.5,
+	Beta:  0.01, //.5,
 }
 
 type Block struct { // Largest Module in the system
-	Letter   uint8
-	X        uint32
-	N        uint32
-	D        uint8
-	V        uint8
+	Letter uint8
+	X      uint32
+	Y      uint32
+	// D        uint8
+	// V        uint8
 	Previous *Block
 }
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 5
+var connections = 10
+
+// func (b *Block) RunRule() {
+// 	EndBlock := b.Previous
+// 	switch b.Letter {
+// 	case 'A':
+// 		if b.D != b.V {
+// 			// Rate of decay of the meta-community
+// 			var q1 float32 = .5
+// 			r1 := uint8(q1*float32((b.V-b.D))) + b.D + 1
+// 			// Sizes of the communities themselves
+// 			var q2 float32 = .5
+// 			r2 := uint32(q2*float32(b.N-uint32(b.V-r1)-(b.X+uint32(r1-b.D)))) + b.X + uint32(r1-b.D) // 3 r1s tf + 1 already
+
+// 			a1 := new(Block)
+
+// 			a1.Letter = 'A'
+// 			a1.X = b.X
+// 			a1.N = r2 - 1
+// 			a1.D = b.D
+// 			a1.V = r1 - 1
+
+// 			b.X = r2
+// 			b.D = r1
+
+// 			b.Previous = a1
+// 			a1.Previous = EndBlock
+
+// 			if a1.D != a1.V {
+// 				wg.Add(1)
+// 				go a1.RunRule()
+// 			}
+// 			if b.D != b.V {
+// 				b.RunRule()
+// 			} else {
+// 				wg.Done()
+// 			}
+// 		} else {
+// 			wg.Done()
+// 		}
+// 	}
+// }
 
 func (b *Block) RunRule() {
-	EndBlock := b.Previous
+	endblock := b.Previous
 	switch b.Letter {
 	case 'A':
-		if b.D != b.V {
-			// Rate of decay of the meta-community
-			var q1 float32 = .5
-			r1 := uint8(q1*float32((b.V-b.D))) + b.D + 1
-			// Sizes of the communities themselves
-			var q2 float32 = .5
-			r2 := uint32(q2*float32(b.N-uint32(b.V-r1)-(b.X+uint32(r1-b.D)))) + b.X + uint32(r1-b.D) // 3 r1s tf + 1 already
+		if b.X != b.Y {
+			q := beta_distro.Rand()
+			q = q / 1.01 // fpa error on machine
+			// q := .5
+			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
-			a1 := new(Block)
+			list := make([]Block, 3)
+			a2 := &list[0]
+			a2.Letter = 'A'
+			a2.X = b.X
+			a2.Y = r - 1
+			a3 := &list[1]
+			a3.Letter = 'L'
+			a3.X = r
 
-			a1.Letter = 'A'
-			a1.X = b.X
-			a1.N = r2 - 1
-			a1.D = b.D
-			a1.V = r1 - 1
+			a4 := &list[2]
+			a4.Letter = 'L'
+			a4.X = r - 1
 
-			b.X = r2
-			b.D = r1
+			// var vallist []uint32
+			// vallist = append(vallist, b.Y)
+			// for i := range connections {
+			// 	var value uint32
+			// 	var unique = false
+			// 	for !unique {
+			// 		unique = true
+			// 		q := beta_distro.Rand()
 
-			b.Previous = a1
-			a1.Previous = EndBlock
+			// 		value = uint32(int(q * float64(lim)))
 
-			if a1.D != a1.V {
+			// 		for _, j := range vallist {
+			// 			if value == j {
+			// 				unique = false
+			// 				break
+			// 			}
+			// 		}
+			// 	}
+			// 	tmp := &list[i]
+			// 	tmp.Letter = 'L'
+			// 	tmp.X = value
+			// 	tmp.Previous = a
+			// 	a = tmp
+			// 	vallist = append(vallist, value)
+			// }
+
+			b.X = r
+			b.Previous = a4
+
+			a4.Previous = a2
+			a2.Previous = a3
+
+			a3.Previous = endblock
+			if a2.X != r-1 {
 				wg.Add(1)
-				go a1.RunRule()
+				go a2.RunRule()
 			}
-			if b.D != b.V {
+			if r != b.Y {
 				b.RunRule()
 			} else {
 				wg.Done()
@@ -77,13 +148,13 @@ func (b *Block) RunRule() {
 }
 
 // func (b *Block) RunRule() {
-// 	EndBlock := b.Previous
+// 	endblock := b.Previous
 // 	switch b.Letter {
 // 	case 'A':
 // 		if b.X != b.Y {
-// 			q := beta_distro.Rand()
-// 			q = q / 1.01
-// 			q = .5
+// 			// q := beta_distro.Rand()
+// 			// q = q / 1.01 // fpa error on machine
+// 			q := .5
 // 			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
 // 			list := make([]Block, connections+1+1)
@@ -126,7 +197,7 @@ func (b *Block) RunRule() {
 // 			b.Previous = a
 
 // 			a2.Previous = a3
-// 			a3.Previous = EndBlock
+// 			a3.Previous = endblock
 // 			if a2.X != r-1 {
 // 				wg.Add(1)
 // 				go a2.RunRule()
@@ -143,12 +214,12 @@ func (b *Block) RunRule() {
 // }
 
 func PrintList(block *Block) int {
-	log.Printf("%+v", block)
+	// log.Printf("%+v", block)
 	current := block.Previous
 	var count int
 	for current != nil {
 		count = count + 1
-		log.Printf("%+v", current)
+		// log.Printf("%+v", current)
 		current = current.Previous
 	}
 	return count
@@ -167,17 +238,17 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		i1, _ := strconv.Atoi(args[0])
 		i2, _ := strconv.Atoi(args[1])
-		i3, _ := strconv.Atoi(args[2])
+		// i3, _ := strconv.Atoi(args[2])
 		i := int(math.Pow(float64(i1), float64(i2)))
 		{
 			lim = uint32(i)
 
 			data := Block{
-				Letter:   'A',
-				X:        1,
-				N:        lim,
-				D:        1,
-				V:        uint8(i3),
+				Letter: 'A',
+				X:      1,
+				Y:      lim,
+				// D:        1,
+				// V:        uint8(i3),
 				Previous: nil,
 			}
 			start := time.Now()
@@ -196,7 +267,7 @@ to quickly create a Cobra application.`,
 
 func (b *Block) debugDumpToFile() {
 	currentblock := b
-	fo, err := os.Create("test.adjlist")
+	fo, err := os.Create("test_2.adjlist")
 	if err != nil {
 		panic(err)
 	}
