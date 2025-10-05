@@ -241,7 +241,7 @@ to quickly create a Cobra application.`,
 		// i3, _ := strconv.Atoi(args[2])
 		i := int(math.Pow(float64(i1), float64(i2)))
 
-		count := 5000
+		count := 1000
 		repeats := 100
 		times := make([]int, count)
 		values := make([]int, count)
