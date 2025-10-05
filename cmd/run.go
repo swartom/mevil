@@ -15,11 +15,11 @@ import (
 	"time"
 )
 
-var beta_distro distuv.Beta = distuv.Beta{
-	// Min: 0,
-	// Max: 1,
-	Alpha: 2,    //7.5,
-	Beta:  0.01, //.5,
+var beta_distro distuv.Uniform = distuv.Uniform{
+	Min: 0,
+	Max: 1,
+	// Alpha: 2, //7.5,
+	// Beta:  1, //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -82,8 +82,8 @@ func (b *Block) RunRule() {
 	case 'A':
 		if b.X != b.Y {
 			q := beta_distro.Rand()
-			q = q / 1.01 // fpa error on machine
-			// q := .5
+			q = q / 1.01 // fpa error on machine rounds high floats to 1 -> not valid in the system
+			// q := 0.5
 			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
 			list := make([]Block, 3)
@@ -240,29 +240,57 @@ to quickly create a Cobra application.`,
 		i2, _ := strconv.Atoi(args[1])
 		// i3, _ := strconv.Atoi(args[2])
 		i := int(math.Pow(float64(i1), float64(i2)))
-		{
-			lim = uint32(i)
 
-			data := Block{
-				Letter: 'A',
-				X:      1,
-				Y:      lim,
-				// D:        1,
-				// V:        uint8(i3),
-				Previous: nil,
+		count := 5000
+		repeats := 100
+		times := make([]int, count)
+		values := make([]int, count)
+		step := i / count
+		for _ = range repeats {
+
+			for i := range count {
+				lim = uint32(i*step + step)
+
+				data := Block{
+					Letter: 'A',
+					X:      1,
+					Y:      lim,
+					// D:        1,
+					// V:        uint8(i3),
+					Previous: nil,
+				}
+				start := time.Now()
+				var list []*Block
+				list = append(list, &data)
+				wg.Add(1)
+				list[0].RunRule()
+				wg.Wait()
+				end := time.Since(start)
+				values[i] = int(lim)
+
+				times[i] = times[i] + int(end)
+				//times[i] = append(times[i], end)
+				// count := PrintList(list[0])
+				// log.Println(i, count)
+				// list[0].debugDumpToFile()
 			}
-			start := time.Now()
-			var list []*Block
-			list = append(list, &data)
-			wg.Add(1)
-			list[0].RunRule()
-			wg.Wait()
-			log.Println(time.Since(start))
-			count := PrintList(list[0])
-			log.Println(i, count)
-			list[0].debugDumpToFile()
 		}
+		log.Println(values)
+		for i := range count {
+			times[i] = int(times[i] / repeats)
+		}
+
+		log.Println(times)
+		writeexectofile(values, times)
 	},
+}
+
+func writeexectofile(values []int, times []int) {
+	fo, _ := os.Create("exec.txt")
+	for i := range len(values) {
+		fo.WriteString(fmt.Sprintf("%d %d\n", values[i], times[i]))
+	}
+	fo.Close()
 }
 
 func (b *Block) debugDumpToFile() {

@@ -9,7 +9,14 @@ print("undirected")
 
 # matrix = nx.convert_matrix(g)
 
-nx.draw(g,node_color="#B4111B",node_size=2,edge_color=".2")
+fig = plt.figure(1)
+
+subfigs = fig.subfigures(1, 2, wspace=0.07)
+
+nx.draw(g,node_color="#B4111B",node_size=5,edge_color=".2")
+
+
+# nx.draw(g,node_color="#B4111B",node_size=5,edge_color=".2")
 # plt.imshow(matrix, cmap='hot', interpolation='nearest')
 # plt.show()
 
