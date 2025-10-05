@@ -41,11 +41,10 @@ func (b *Block) RunRule() {
 	switch b.Letter {
 	case 'L':
 		if b.X > 0 {
-			if beta_distro.Rand() > .99 {
+			if beta_distro.Rand() > 0 {
 				a1 := new(Block)
 				a1.Letter = 'L'
 				a1.X = b.X - 1
-
 				b.Previous = a1
 				a1.Previous = EndBlock
 			}
@@ -58,7 +57,7 @@ func (b *Block) RunRule() {
 	case 'A':
 		if b.D != b.V && b.V != 0 {
 			// Rate of decay of the meta-community
-			var q1 float64 = beta_distro.Rand()
+			var q1 float64 = .5 // beta_distro.Rand()
 			r1 := uint32(q1*float64((b.V-b.D))) + b.D + 1
 			// Sizes of the communities themselves
 			var q2 float64 = q1
@@ -82,6 +81,10 @@ func (b *Block) RunRule() {
 				b.D = b.X
 				b.V = b.X
 			}
+			if a1.D == a1.V {
+				a1.D = a1.X
+				a1.V = a1.X
+			}
 
 			wg.Add(1)
 			go a1.RunRule()
@@ -89,7 +92,7 @@ func (b *Block) RunRule() {
 			b.RunRule()
 
 		} else if b.V == 0 && b.D < b.Y+1 {
-			if beta_distro.Rand() > 0.2 {
+			if beta_distro.Rand() > 1 {
 				a1 := new(Block)
 				a1.Letter = 'L'
 				a1.X = b.D
@@ -104,7 +107,7 @@ func (b *Block) RunRule() {
 			a1 := new(Block)
 			a1.Letter = 'L'
 			a1.X = b.V
-			a1.Y = b.X
+			a1.Y = b.X + 1
 
 			a2 := new(Block)
 			a2.Letter = 'A'
@@ -113,11 +116,22 @@ func (b *Block) RunRule() {
 			a2.D = b.X + 1
 			a2.V = 0
 
-			b.X = b.X + 1
-			b.Previous = a2
-			a2.Previous = a1
-			a1.Previous = EndBlock
+			b.Previous = a1
+			a1.Previous = a2
+			if b.X == b.V {
+				a3 := new(Block)
+				a3.Letter = 'L'
+				a3.X = b.V
+				a3.Y = b.X + 1
 
+				a2.Previous = a3
+				a3.Previous = EndBlock
+				wg.Add(1)
+				go a3.RunRule()
+			} else {
+				a2.Previous = EndBlock
+			}
+			b.X = b.X + 1
 			wg.Add(2)
 			go a2.RunRule()
 			go a1.RunRule()
