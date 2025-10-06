@@ -9,6 +9,7 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 	"log"
 	"math"
+
 	"os"
 	"strconv"
 	"sync"
@@ -18,7 +19,7 @@ import (
 var beta_distro distuv.Uniform = distuv.Uniform{
 	Min: 0,
 	Max: 1,
-	// Alpha: 2, //7.5,
+	// Alpha: 1, //7.5,
 	// Beta:  1, //.5,
 }
 
@@ -40,24 +41,25 @@ func (b *Block) RunRule() {
 	EndBlock := b.Previous
 	switch b.Letter {
 	case 'L':
-		if b.X > 0 {
-			if beta_distro.Rand() > 0 {
+		if b.X != 1 {
+			if beta_distro.Rand() > .5 {
 				a1 := new(Block)
 				a1.Letter = 'L'
 				a1.X = b.X - 1
 				b.Previous = a1
 				a1.Previous = EndBlock
 			}
+
 			b.X = b.X - 1
 			b.RunRule()
-		} else if b.X == 0 {
+		} else if b.X == 1 {
 			b.X = b.Y
 			wg.Done()
 		}
 	case 'A':
 		if b.D != b.V && b.V != 0 {
 			// Rate of decay of the meta-community
-			var q1 float64 = .5 // beta_distro.Rand()
+			var q1 float64 = beta_distro.Rand()
 			r1 := uint32(q1*float64((b.V-b.D))) + b.D + 1
 			// Sizes of the communities themselves
 			var q2 float64 = q1
@@ -92,7 +94,7 @@ func (b *Block) RunRule() {
 			b.RunRule()
 
 		} else if b.V == 0 && b.D < b.Y+1 {
-			if beta_distro.Rand() > 1 {
+			if beta_distro.Rand() > .25 {
 				a1 := new(Block)
 				a1.Letter = 'L'
 				a1.X = b.D
@@ -100,15 +102,16 @@ func (b *Block) RunRule() {
 				b.Previous = a1
 				a1.Previous = EndBlock
 			}
-			b.D = b.D + 1 // + uint32(beta_distro.Rand()*float64(1))
+			b.D = b.D + 1 //  uint32(beta_distro.Rand()*float64(10))
 			b.RunRule()
 		} else if b.X != b.Y && b.V != 0 {
-
-			a1 := new(Block)
-			a1.Letter = 'L'
-			a1.X = b.V
-			a1.Y = b.X + 1
-
+			var a1 *Block
+			if b.V != 0 {
+				a1 = new(Block)
+				a1.Letter = 'L'
+				a1.X = b.V
+				a1.Y = b.X + 1
+			}
 			a2 := new(Block)
 			a2.Letter = 'A'
 			a2.X = b.X
@@ -116,13 +119,17 @@ func (b *Block) RunRule() {
 			a2.D = b.X + 1
 			a2.V = 0
 
-			b.Previous = a1
-			a1.Previous = a2
-			if b.X == b.V {
+			if b.V != 0 {
+				b.Previous = a1
+				a1.Previous = a2
+			} else {
+				b.Previous = a2
+			}
+			if b.X == b.V && b.V != 0 {
 				a3 := new(Block)
 				a3.Letter = 'L'
 				a3.X = b.V
-				a3.Y = b.X + 1
+				a3.Y = b.X
 
 				a2.Previous = a3
 				a3.Previous = EndBlock
@@ -132,9 +139,12 @@ func (b *Block) RunRule() {
 				a2.Previous = EndBlock
 			}
 			b.X = b.X + 1
-			wg.Add(2)
+			wg.Add(1)
 			go a2.RunRule()
-			go a1.RunRule()
+			if b.V != 0 {
+				wg.Add(1)
+				go a1.RunRule()
+			}
 			b.RunRule()
 		} else {
 			wg.Done()
@@ -303,6 +313,9 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// r := rand.New(rand.NewSource(5))
+		// beta_distro.Src = r
+
 		i1, _ := strconv.Atoi(args[0])
 		i2, _ := strconv.Atoi(args[1])
 		i3, _ := strconv.Atoi(args[2])
