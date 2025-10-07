@@ -17,7 +17,7 @@ plt.rcParams['text.usetex'] = True
 plt.rcParams["font.family"] = "monospace"
 fig = plt.figure(1)
 ax2 = fig.add_subplot(1,1,1)
-ax2.scatter(x,y,marker='.',color=".3",s=2)#,lw=0.0,ms=2)
+ax2.plot(x,y,marker='.',color=".3",s=2)#,lw=0,ms=2)
 ax2.grid(True,which="minor",ls=":",c=".1",alpha=.1)
 ax2.grid(True,which="major",ls="-",c=".1",alpha=.5)
 ax2.set_xlabel('Vertex Count',fontsize=10)
