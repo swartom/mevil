@@ -19,7 +19,7 @@ import (
 var beta_distro distuv.Beta = distuv.Beta{
 	// Min: 0,
 	// Max: 1,
-	Alpha: 2,  //7.5,
+	Alpha: 1,  //7.5,
 	Beta:  .5, //.5,
 }
 
@@ -34,7 +34,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 0
+var connections = 4
 var min uint32 = 5
 
 // func (b *Block) RunRule() {
@@ -233,52 +233,61 @@ func (b *Block) RunRule() {
 	switch b.Letter {
 	case 'A':
 		if b.X != b.Y {
-			q := beta_distro.Rand()
-			q = q / 1.01 // fpa error on machine
-			// q := .5
+			// q := beta_distro.rand()
+			// q = q / 1.01 // fpa error on machine
+			q := .5
 			r := uint32((q)*float64((b.Y-b.X))) + b.X + 1
 
-			list := make([]Block, connections+1+1)
+			list := make([]Block, connections+1)
 			a2 := &list[connections]
 			a2.Letter = 'A'
 			a2.X = b.X
 			a2.Y = r - 1
-			a3 := &list[connections+1]
-			a3.Letter = 'L'
-			a3.X = b.Y
 
 			var a *Block = a2
 			var vallist []uint32
-			vallist = append(vallist, b.Y)
-			for i := range connections {
-				var value uint32
-				var unique = false
-				for !unique {
-					unique = true
+
+			connhere := uint32(connections)
+			if lim-b.X <= connhere {
+				connhere = 0
+				for i := range lim - b.X {
+					tmp := &list[i]
+					tmp.Letter = 'L'
+					tmp.X = b.X + i
+					tmp.Previous = a
+					a = tmp
+				}
+			} else {
+				//TODO fix duplicate edegs issue (its a code problem)
+				for i := range connhere {
+					var value uint32
+
 					q := beta_distro.Rand()
 
-					value = uint32(int(q * float64(lim)))
+					value = uint32(int(q*float64(lim-b.X-uint32(len(vallist))))) + b.X
 
 					for _, j := range vallist {
 						if value == j {
-							unique = false
-							break
+							if value+1 <= lim {
+								value = value + 1
+							}
 						}
 					}
+
+					tmp := &list[i]
+					tmp.Letter = 'L'
+					tmp.X = value
+					tmp.Previous = a
+					a = tmp
+					vallist = append(vallist, value)
 				}
-				tmp := &list[i]
-				tmp.Letter = 'L'
-				tmp.X = value
-				tmp.Previous = a
-				a = tmp
-				vallist = append(vallist, value)
 			}
 
 			b.X = r
 			b.Previous = a
 
-			a2.Previous = a3
-			a3.Previous = endblock
+			a2.Previous = endblock
+
 			if a2.X != r-1 {
 				wg.Add(1)
 				go a2.RunRule()
@@ -325,8 +334,8 @@ to quickly create a Cobra application.`,
 		// i3, _ := strconv.Atoi(args[2])
 		i := int(math.Pow(float64(i1), float64(i2)))
 
-		count := 10
-		repeats := 5
+		count := 1
+		repeats := 1
 		times := make([]int, count)
 		values := make([]int, count)
 		step := i / count
@@ -351,7 +360,7 @@ to quickly create a Cobra application.`,
 				wg.Wait()
 				end := time.Since(start)
 				values[i] = int(lim)
-
+				log.Println(end)
 				times[i] = times[i] + int(end)
 				//times[i] = append(times[i], end)
 				// PrintList(list[0])
