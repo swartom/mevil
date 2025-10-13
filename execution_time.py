@@ -11,8 +11,8 @@ with open("exec.txt") as f:
         l = line.split(" ")
         edges = int(l[0]) * 60
         x.append(int(l[0]))
-        y.append(int(l[1])/10**6)
-        # y.append((edges/10)/(float(l[1])/10**9)/10**6)
+        # y.append(int(l[1])/10**6)
+        y.append((edges/8)/(float(l[1])/10**9)/10**6)
 
 print(y)
 
