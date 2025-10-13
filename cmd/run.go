@@ -341,7 +341,7 @@ to quickly create a Cobra application.`,
 
 		for c := range repeats {
 			log.Println("Repeat No. : ", c)
-			time.Sleep(10000)
+			time.Sleep(4 * time.Second)
 			for i := range count {
 				lim = uint32(i*step + step)
 

@@ -25,7 +25,7 @@ ax2.semilogy(x,y,marker='x',color="red",lw=1,ms=2)
 ax2.grid(True,which="minor",ls=":",c=".1",alpha=.1)
 ax2.grid(True,which="major",ls="-",c=".1",alpha=.5)
 ax2.set_xlabel('Vertex Count',fontsize=10)
-ax2.set_ylabel('Milliseconds ($ms$)',fontsize=10)
+ax2.set_ylabel('Million Edges Per Processor Per Second ($mE/PE/s$)',fontsize=10)
 ax2.set_ylim(-100,10**4)
 
 plt.xticks(size = 8)
