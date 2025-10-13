@@ -265,13 +265,13 @@ func (b *Block) RunRule() {
 
 					value = uint32(int(q*float64(r-uint32(len(vallist)))) + len(vallist))
 
-					// for _, j := range vallist {
-					// 	if value == j {
-					// 		if value-1 > 0 {
-					// 			value = value - 1
-					// 		}
-					// 	}
-					// }
+					for _, j := range vallist {
+						if value == j {
+							if value-1 > 0 {
+								value = value - 1
+							}
+						}
+					}
 
 					tmp := &list[i]
 					tmp.Letter = 'L'
