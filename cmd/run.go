@@ -338,10 +338,10 @@ to quickly create a Cobra application.`,
 		times := make([]int, count)
 		values := make([]int, count)
 		step := i / count
-		time.Sleep(1000)
+
 		for c := range repeats {
 			log.Println("Repeat No. : ", c)
-
+			time.Sleep(10000)
 			for i := range count {
 				lim = uint32(i*step + step)
 
