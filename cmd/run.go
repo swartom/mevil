@@ -16,11 +16,11 @@ import (
 	"time"
 )
 
-var beta_distro distuv.Uniform = distuv.Uniform{
-	Min: 0,
-	Max: 1,
-	// Alpha: .01, //7.5,
-	// Beta:  1,   //.5,
+var beta_distro distuv.Beta = distuv.Beta{
+	// Min: 0,
+	// Max: 1,
+	Alpha: .01, //7.5,
+	Beta:  1,   //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -34,7 +34,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 4
+var connections = 60
 var min uint32 = 5
 
 // func (b *Block) RunRule() {
