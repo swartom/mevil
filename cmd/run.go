@@ -16,11 +16,11 @@ import (
 	"time"
 )
 
-var beta_distro distuv.Beta = distuv.Beta{
-	// Min: 0,
-	// Max: 1,
-	Alpha: 1,  //7.5,
-	Beta:  .5, //.5,
+var beta_distro distuv.Uniform = distuv.Uniform{
+	Min: 0,
+	Max: 1,
+	// Alpha: .01, //7.5,
+	// Beta:  1,   //.5,
 }
 
 type Block struct { // Largest Module in the system
@@ -34,7 +34,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 10
+var connections = 4
 var min uint32 = 5
 
 // func (b *Block) RunRule() {
@@ -248,12 +248,11 @@ func (b *Block) RunRule() {
 			var vallist []uint32
 
 			connhere := uint32(connections)
-			if lim-b.X <= connhere {
-				connhere = 0
-				for i := range lim - b.X {
+			if r < connhere {
+				for i := range b.X - 1 {
 					tmp := &list[i]
 					tmp.Letter = 'L'
-					tmp.X = b.X + i
+					tmp.X = b.X - i - 1
 					tmp.Previous = a
 					a = tmp
 				}
@@ -264,12 +263,12 @@ func (b *Block) RunRule() {
 
 					q := beta_distro.Rand()
 
-					value = uint32(int(q*float64(lim-b.X-uint32(len(vallist))))) + b.X
+					value = uint32(int(q*float64(r-uint32(len(vallist)))) + len(vallist))
 
 					for _, j := range vallist {
 						if value == j {
-							if value+1 <= lim {
-								value = value + 1
+							if value-1 > 0 {
+								value = value - 1
 							}
 						}
 					}
@@ -335,11 +334,13 @@ to quickly create a Cobra application.`,
 		i := int(math.Pow(float64(i1), float64(i2)))
 
 		count := 1
-		repeats := 1
+		repeats := 100
 		times := make([]int, count)
 		values := make([]int, count)
 		step := i / count
-		for _ = range repeats {
+		time.Sleep(1000)
+		for c := range repeats {
+			log.Println("Repeat No. : ", c)
 
 			for i := range count {
 				lim = uint32(i*step + step)
@@ -356,6 +357,7 @@ to quickly create a Cobra application.`,
 				var list []*Block
 				list = append(list, &data)
 				wg.Add(1)
+				start = time.Now()
 				list[0].RunRule()
 				wg.Wait()
 				end := time.Since(start)
@@ -365,7 +367,7 @@ to quickly create a Cobra application.`,
 				//times[i] = append(times[i], end)
 				// PrintList(list[0])
 				// log.Println(i, count)
-				list[0].debugDumpToFile()
+				// list[0].debugDumpToFile()
 			}
 		}
 		log.Println(values)

@@ -10,7 +10,7 @@ for f in open("exec.txt"):
 G = nx.read_adjlist("test_2.adjlist")
 
 g = G.to_undirected()
-print(f'{((len(g.edges)/10)/(l[0]/10**9))/10**6:.2f}m/PE/s')
+print(f'{((len(g.edges)/10)/(float(l[0])/10**9))/10**6:.2f}m/PE/s')
 
 degree_sequence = sorted((d for n, d in g.degree()), reverse=True)
 dmax = max(degree_sequence)
