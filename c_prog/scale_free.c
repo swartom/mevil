@@ -9,12 +9,15 @@ typedef struct parametric_module {
     uint32_t x;
     uint32_t y;
 } module;
+gsl_rng *rand_src;
 
-int rule( struct parametric_module* m, gsl_rng *rand_src) {
+void* rule( void* ptr) {
+    module* m = (module *) ptr;
     // Memory of the particular block in memory, excuse the pun
     // struct parametric_module* end_of_block_pointer = m->previous;
     switch (m->kind) {
         case 'A':
+
             // int r = ((m->y) - (m->x))/DIVISOR + m->x + 1; // Defining this here requires a memory call.
             module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module));
             // Assign the last element in the list
@@ -52,12 +55,23 @@ int rule( struct parametric_module* m, gsl_rng *rand_src) {
             m->previous = repeater_pointer;
             m->x = A_r->y + 1;
 
-            if (A_r->x != A_r->y)
-                rule(A_r,rand_src);
-
-            if (m->x != m->y)
-                rule(m,rand_src);
-            break;
+            if (A_r->x != A_r->y){
+                if((A_r->y)-(A_r->x) > 10000 ){
+                    pthread_t thread;
+                    pthread_create( &thread, NULL, rule, A_r);
+                    if (m->x != m->y){
+                        rule(m);
+                    }
+                    pthread_join(thread,NULL);
+                } else {
+                    rule(A_r);
+                    if (m->x != m->y){
+                        rule(m);
+                    }
+                }
+            } else if (m->x != m->y){
+                rule(m);
+            }
         default:
             break;
     }
@@ -85,7 +99,7 @@ int write_file(module* iv) {
 
 
 int main(int argc, char *argv[]) {
-    gsl_rng * r = gsl_rng_alloc (gsl_rng_taus);
+    rand_src = gsl_rng_alloc (gsl_rng_taus);
     uint32_t max = MAX;
     module* iv = (module*)malloc(sizeof(module));
     iv->kind = 'A';
@@ -94,12 +108,12 @@ int main(int argc, char *argv[]) {
 
     struct timespec start={0,0}, end={0,0};
     clock_gettime(CLOCK_MONOTONIC, &start);
-    rule(iv,r);
+    rule(iv);
     clock_gettime(CLOCK_MONOTONIC, &end);
     printf("%.5f\n",((double)end.tv_sec + 1.0e-9*end.tv_nsec) - (
                (double)start.tv_sec + 1.0e-9*start.tv_nsec));
 
-    /* write_file(iv); */
+    write_file(iv);
 
     module* previous = iv;
     do {
@@ -111,6 +125,6 @@ int main(int argc, char *argv[]) {
         }
     }while (previous->x != 1);
     free(previous);
-    gsl_rng_free(r);
+    gsl_rng_free(rand_src);
     return 1;
 }

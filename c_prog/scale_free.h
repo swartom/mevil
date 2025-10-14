@@ -12,7 +12,7 @@
 #define CONNECTIONS 60
 
 
-#define ALPHA 0.5
+#define ALPHA 0.01
 #define BETA 1.0
 
 #endif // SCALE_FREE_H_
