@@ -9,8 +9,8 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 	"log"
 	"math"
-
 	"os"
+	"runtime/pprof"
 	"strconv"
 	"sync"
 	"time"
@@ -325,6 +325,12 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		f, err := os.Create("CPUprofile.prof")
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 		// r := rand.New(rand.NewSource(5))
 		// beta_distro.Src = r
 
