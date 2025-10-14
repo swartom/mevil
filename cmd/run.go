@@ -34,7 +34,7 @@ type Block struct { // Largest Module in the system
 
 var wg sync.WaitGroup
 var lim uint32 = 1
-var connections = 60
+var connections = 10
 var min uint32 = 5
 
 // func (b *Block) RunRule() {
