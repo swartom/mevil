@@ -91,12 +91,14 @@ int main(int argc, char *argv[]) {
     iv->kind = 'A';
     iv->x = 1;
     iv->y = max;
-    time_t rawtime;
-    struct tm * timeinfo;
-    time_t start = time(0);
+
+    struct timespec start={0,0}, end={0,0};
+    clock_gettime(CLOCK_MONOTONIC, &start);
     rule(iv,r);
-    time_t end = time(0);
-    printf("%l",(end-start));
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    printf("%.5f\n",((double)end.tv_sec + 1.0e-9*end.tv_nsec) - (
+               (double)start.tv_sec + 1.0e-9*start.tv_nsec));
+
     /* write_file(iv); */
 
     module* previous = iv;
