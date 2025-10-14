@@ -7,7 +7,7 @@ import (
 )
 
 func Benchmark_MillonVertex(b *testing.B) {
-	lim = uint32(math.Pow(float64(10), float64(8)))
+	lim = uint32(math.Pow(float64(10), float64(6)))
 
 	for b.Loop() {
 		data := Block{
