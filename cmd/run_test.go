@@ -7,9 +7,11 @@ import (
 )
 
 func Benchmark_MillonVertex(b *testing.B) {
-	lim = uint32(math.Pow(float64(10), float64(6)))
+	lim = uint32(math.Pow(float64(10), float64(5)))
 
 	for b.Loop() {
+		b.StopTimer()
+		b.ResetTimer()
 		data := Block{
 			Letter: 'A',
 			X:      1,
@@ -21,7 +23,7 @@ func Benchmark_MillonVertex(b *testing.B) {
 		var list []*Block
 		list = append(list, &data)
 		wg.Add(1)
-		b.ResetTimer()
+		b.StartTimer()
 		list[0].RunRule()
 		wg.Wait()
 	}
