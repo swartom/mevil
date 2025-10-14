@@ -56,7 +56,7 @@ void* rule( void* ptr) {
             m->x = A_r->y + 1;
 
             if (A_r->x != A_r->y){
-                if((A_r->y)-(A_r->x) > 10000 ){
+                if((A_r->y)-(A_r->x) >= LIMIT ){
                     pthread_t thread;
                     pthread_create( &thread, NULL, rule, A_r);
                     if (m->x != m->y){
@@ -99,6 +99,7 @@ int write_file(module* iv) {
 
 
 int main(int argc, char *argv[]) {
+    for(int i =0; i < 10; i++) {
     rand_src = gsl_rng_alloc (gsl_rng_taus);
     uint32_t max = MAX;
     module* iv = (module*)malloc(sizeof(module));
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
     printf("%.5f\n",((double)end.tv_sec + 1.0e-9*end.tv_nsec) - (
                (double)start.tv_sec + 1.0e-9*start.tv_nsec));
 
-    write_file(iv);
+    /* write_file(iv); */
 
     module* previous = iv;
     do {
@@ -126,5 +127,6 @@ int main(int argc, char *argv[]) {
     }while (previous->x != 1);
     free(previous);
     gsl_rng_free(rand_src);
+    }
     return 1;
 }
