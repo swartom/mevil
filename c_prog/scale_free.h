@@ -9,13 +9,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define MAX 250000
+#define MAX 250000000
 #define DIVISOR 2
 #define CONNECTIONS 4
 #define THREADS 32  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
 #define LIMIT MAX/THREADS
-#define REPETITIONS 300
-#define PROCESSORS 4
+#define REPETITIONS 100
+#define PROCESSORS 32
 
 #define ALPHA 0.01
 #define BETA 1.0
