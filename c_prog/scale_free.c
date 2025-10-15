@@ -3,13 +3,14 @@
 #include <pthread.h>
 #include <time.h>
 
+#define INTEGER_TYPE uint64_t
+
 typedef struct parametric_module {
     struct parametric_module * previous;
     uint8_t kind;
-    uint32_t x;
-    uint32_t y;
+    INTEGER_TYPE x;
+    INTEGER_TYPE y;
 } module;
-
 
 typedef struct wrapper {
     module* m;
@@ -42,10 +43,10 @@ void* rule( void* p) {
     M->x = A_r.y + 1;
 
     {
-        uint32_t values[CONNECTIONS];
+        INTEGER_TYPE values[CONNECTIONS];
     for(int i =1; i < CONNECTIONS+1; i++) {
         elements[i].kind = 'L';
-        elements[i].x = (uint32_t)(gsl_ran_beta(R, ALPHA, BETA) * (double)(A_r.y + 1)) + 1;
+        elements[i].x = (INTEGER_TYPE)(gsl_ran_beta(R, ALPHA, BETA) * (double)(A_r.y + 1)) + 1;
         elements[i].previous = &elements[i-1];
     }
     }
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
     /* module* pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX); */
 
     rand_src = gsl_rng_alloc (gsl_rng_taus);
-    uint32_t max = MAX;
+    INTEGER_TYPE max = MAX;
     module* iv = (module*)malloc(sizeof(module));
     iv->kind = 'A';
     iv->x = 1;
