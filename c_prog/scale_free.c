@@ -9,72 +9,68 @@ typedef struct parametric_module {
     uint32_t x;
     uint32_t y;
 } module;
-gsl_rng *rand_src;
 
-void* rule( void* ptr) {
-    module* m = (module *) ptr;
+
+typedef struct wrapper {
+    module* m;
+    gsl_rng* r;
+} w;
+
+module* pre_allocation;
+
+void* rule( void* p) {
+    #define M ((w *)p)->m
+    #define R ((w *)p)->r
     // Memory of the particular block in memory, excuse the pun
     // struct parametric_module* end_of_block_pointer = m->previous;
-    switch (m->kind) {
-        case 'A':
+    /* switch (m->kind) { */
+    /*     case 'A': */
+    // int r = ((m->y) - (m->x))/DIVISOR + m->x + 1; // Defining this here requires a memory call.
+    /* module* elements = &pre_allocation[(CONNECTIONS + 1)*MAX*( ((M->y) - (M->x))/DIVISOR + M->x-1)]; */
+    module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module));
 
-            // int r = ((m->y) - (m->x))/DIVISOR + m->x + 1; // Defining this here requires a memory call.
-            module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module));
-            // Assign the last element in the list
-            // NOTES This MUST be the first element of the memory allocation block otherwise
-            // WE CANNOT identify the start of the memory block to free later on...
-            module *A_r = &elements[0];
-            A_r->kind = 'A';
-            A_r->x = m->x;
-            // This value is = r - 1
-            A_r->y = ((m->y) - (m->x))/DIVISOR + m->x;
-            A_r->previous = m->previous;
-            module *repeater_pointer = A_r;
-            /* if (A_r->y  < CONNECTIONS) { */
-            /*     // Case for there is fewer connections than there are differences */
-            /*     for(int i =0; i < CONNECTIONS; i++) { */
-            /*         // Each element value assigned. */
-            /*         elements[i].kind = 'L'; */
-            /*         elements[i].x = m->x -i - 1; */
-            /*         elements[i].previous = repeater_pointer; */
-            /*         repeater_pointer = &elements[i]; */
-            /*         // Filter Through the repeater pointer */
-            /*     } */
-            /* } else { */
-                // There should be *some* form of stochastic process selection...
-            for(int i =1; i < CONNECTIONS+1; i++) {
-                // Each element value assigned.
-                elements[i].kind = 'L';
-                elements[i].x = (uint32_t)(gsl_ran_beta(rand_src, ALPHA, BETA) * (double)(A_r->y + 1)) + 1;
-                elements[i].previous = repeater_pointer;
-                repeater_pointer = &elements[i];
-            }
+    // Assign the last element in the list
+    // NOTES This MUST be the first element of the memory allocation block otherwise
+    // WE CANNOT identify the start of the memory block to free later on...
+    #define A_r elements[0]
+    A_r.kind = 'A';
+    A_r.x = M->x;
+    A_r.y = ((M->y) - (M->x))/DIVISOR + M->x; // r-1
+    A_r.previous = M->previous;
 
-            /* } */
-            // Link up to list!
-            m->previous = repeater_pointer;
-            m->x = A_r->y + 1;
+    M->previous = &elements[CONNECTIONS];
+    M->x = A_r.y + 1;
 
-            if (A_r->x != A_r->y){
-                if((A_r->y)-(A_r->x) >= LIMIT ){
-                    pthread_t thread;
-                    pthread_create( &thread, NULL, rule, A_r);
-                    if (m->x != m->y){
-                        rule(m);
-                    }
-                    pthread_join(thread,NULL);
-                } else {
-                    rule(A_r);
-                    if (m->x != m->y){
-                        rule(m);
-                    }
-                }
-            } else if (m->x != m->y){
-                rule(m);
-            }
-        default:
-            break;
+    {
+        uint32_t values[CONNECTIONS];
+    for(int i =1; i < CONNECTIONS+1; i++) {
+        elements[i].kind = 'L';
+        elements[i].x = (uint32_t)(gsl_ran_beta(R, ALPHA, BETA) * (double)(A_r.y + 1)) + 1;
+        elements[i].previous = &elements[i-1];
     }
+    }
+
+    #define check_M if (M->x != M->y) rule(p);
+
+    if (A_r.x != A_r.y){
+        w wrapper;
+        wrapper.m = &A_r;
+        if((A_r.y)-(A_r.x) >= LIMIT ){
+            pthread_t thread;
+            wrapper.r = gsl_rng_alloc (gsl_rng_taus);
+            pthread_create( &thread, NULL, rule, &wrapper);
+            check_M
+            pthread_join(thread,NULL);
+            gsl_rng_free(wrapper.r);
+        } else {
+            wrapper.r = R;
+            rule(&wrapper);
+            check_M
+        }
+    } else check_M
+    /*     default: */
+    /*         break; */
+    /* } */
     return 0;
 }
 
@@ -82,10 +78,14 @@ int write_file(module* iv) {
     module* chain = iv;
     FILE *fptr;
     fptr = fopen("graph.adjlist", "w");
+    int test = 0;
     do {
         switch (chain->kind) {
             case 'A':
-                fprintf(fptr, "\n%d",chain->x);
+                if( test++ == 0)
+                    fprintf(fptr, "%d",chain->x);
+                else
+                    fprintf(fptr, "\n%d",chain->x);
                 break;
             default:
                 fprintf(fptr, " %d",chain->x);
@@ -99,7 +99,10 @@ int write_file(module* iv) {
 
 
 int main(int argc, char *argv[]) {
-    for(int i =0; i < 10; i++) {
+    /* for(int i = 0; i < 10; i ++){ */
+    gsl_rng *rand_src;
+    /* module* pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX); */
+
     rand_src = gsl_rng_alloc (gsl_rng_taus);
     uint32_t max = MAX;
     module* iv = (module*)malloc(sizeof(module));
@@ -107,14 +110,18 @@ int main(int argc, char *argv[]) {
     iv->x = 1;
     iv->y = max;
 
+    w wrapper;
+
+    wrapper.m = iv;
+    wrapper.r = rand_src;
+
     struct timespec start={0,0}, end={0,0};
     clock_gettime(CLOCK_MONOTONIC, &start);
-    rule(iv);
+    rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
-    printf("%.5f\n",((double)end.tv_sec + 1.0e-9*end.tv_nsec) - (
-               (double)start.tv_sec + 1.0e-9*start.tv_nsec));
+    printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
-    /* write_file(iv); */
+    write_file(iv);
 
     module* previous = iv;
     do {
@@ -126,7 +133,8 @@ int main(int argc, char *argv[]) {
         }
     }while (previous->x != 1);
     free(previous);
+    free(pre_allocation);
     gsl_rng_free(rand_src);
-    }
+    /* } */
     return 1;
 }
