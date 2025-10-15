@@ -11,7 +11,7 @@
 #define MAX 250000000
 #define DIVISOR 2
 #define CONNECTIONS 4
-#define THREADS 16  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
+#define THREADS 128  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
 #define LIMIT MAX/THREADS
 
 #define ALPHA 0.01
