@@ -120,8 +120,9 @@ int main(int argc, char *argv[]) {
     wrapper.r = rand_src;
 
     pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
-
+    
     struct timespec start={0,0}, end={0,0};
+    time.Sleep(SECONDS_WAIT_BETWEEN_REPEATS*1000);
     clock_gettime(CLOCK_MONOTONIC, &start);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
