@@ -101,7 +101,7 @@ int write_file(module* iv) {
 
 
 int main(int argc, char *argv[]) {
-    double time = 0.0;
+    double total = 0.0;
     double* times = alloca(REPETITIONS*sizeof(double));
     for(int i = 0; i < REPETITIONS; i ++){
 
@@ -122,12 +122,12 @@ int main(int argc, char *argv[]) {
     pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
     
     struct timespec start={0,0}, end={0,0};
-    time.Sleep(SECONDS_WAIT_BETWEEN_REPEATS*1000);
+    sleep(SECONDS_WAIT_BETWEEN_REPEATS*1000);
     clock_gettime(CLOCK_MONOTONIC, &start);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
     times[i] = (end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec);
-    time += times[i];
+    total += times[i];
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
     /* write_file(iv); */
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
     free(pre_allocation);
     gsl_rng_free(rand_src);
     }
-    double average = time/(double)(REPETITIONS);
+    double average = total/(double)(REPETITIONS);
     double sum = 0;
     for (int i = 0; i < REPETITIONS; ++i)
         sum += pow(times[i] -average,2);
