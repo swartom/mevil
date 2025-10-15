@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
     
     struct timespec start={0,0}, end={0,0};
-    sleep(SECONDS_WAIT_BETWEEN_REPEATS*1000);
+    sleep(SECONDS_WAIT_BETWEEN_REPEATS);
     clock_gettime(CLOCK_MONOTONIC, &start);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
