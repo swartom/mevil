@@ -101,10 +101,12 @@ int write_file(module* iv) {
 
 
 int main(int argc, char *argv[]) {
-    /* for(int i = 0; i < 10; i ++){ */
+    double time = 0.0;
+    double* times = alloca(REPETITIONS*sizeof(double));
+    for(int i = 0; i < REPETITIONS; i ++){
+
+
     gsl_rng *rand_src;
-
-
     rand_src = gsl_rng_alloc (gsl_rng_taus);
     INTEGER_TYPE max = MAX;
     module* iv = (module*)malloc(sizeof(module));
@@ -123,9 +125,11 @@ int main(int argc, char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
+    times[i] = (end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec);
+    time += times[i];
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
-    write_file(iv);
+    /* write_file(iv); */
 
     /* module* previous = iv; */
     /* do { */
@@ -139,6 +143,14 @@ int main(int argc, char *argv[]) {
     /* free(previous); */
     free(pre_allocation);
     gsl_rng_free(rand_src);
-    /* } */
+    }
+    double average = time/(double)(REPETITIONS);
+    double sum = 0;
+    for (int i = 0; i < REPETITIONS; ++i)
+        sum += pow(times[i] -average,2);
+    double variance = sum/REPETITIONS;
+    double std_deviation = sqrt(variance);
+    printf("Average over %d : %.10fs : stdv: %.3f\%\n", (int)REPETITIONS, average,(std_deviation/average)*100);
+    printf("%.2fmE/PE/s",(((double)(MAX*CONNECTIONS)/1000000)/PROCESSORS)/average);
     return 1;
 }
