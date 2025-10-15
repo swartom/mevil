@@ -27,10 +27,11 @@ void* rule( void* p) {
     /* switch (m->kind) { */
     /*     case 'A': */
     // int r = ((m->y) - (m->x))/DIVISOR + m->x + 1; // Defining this here requires a memory call.
-    /* module* elements = &pre_allocation[(CONNECTIONS + 1)*MAX*( ((M->y) - (M->x))/DIVISOR + M->x-1)]; */
-    module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module));
+    module* elements = (module*) &pre_allocation[(CONNECTIONS + 1)*( ((M->y) - (M->x))/DIVISOR + M->x - 1)];
+    /* module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module)); */
 
-    // Assign the last element in the list
+    /* printf("%d",(CONNECTIONS + 1)*( ((M->y) - (M->x))/DIVISOR + M->x - 1)); */
+    // ASSIGN the last element in the list
     // NOTES This MUST be the first element of the memory allocation block otherwise
     // WE CANNOT identify the start of the memory block to free later on...
     #define A_r elements[0]
@@ -43,7 +44,7 @@ void* rule( void* p) {
     M->x = A_r.y + 1;
 
     {
-        INTEGER_TYPE values[CONNECTIONS];
+        /* INTEGER_TYPE values[CONNECTIONS]; */
     for(int i =1; i < CONNECTIONS+1; i++) {
         elements[i].kind = 'L';
         elements[i].x = (INTEGER_TYPE)(gsl_ran_beta(R, ALPHA, BETA) * (double)(A_r.y + 1)) + 1;
@@ -56,7 +57,7 @@ void* rule( void* p) {
     if (A_r.x != A_r.y){
         w wrapper;
         wrapper.m = &A_r;
-        if((A_r.y)-(A_r.x) >= LIMIT ){
+        if((A_r.y)-(A_r.x) > LIMIT ){
             pthread_t thread;
             wrapper.r = gsl_rng_alloc (gsl_rng_taus);
             pthread_create( &thread, NULL, rule, &wrapper);
@@ -102,7 +103,7 @@ int write_file(module* iv) {
 int main(int argc, char *argv[]) {
     /* for(int i = 0; i < 10; i ++){ */
     gsl_rng *rand_src;
-    /* module* pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX); */
+
 
     rand_src = gsl_rng_alloc (gsl_rng_taus);
     INTEGER_TYPE max = MAX;
@@ -118,22 +119,23 @@ int main(int argc, char *argv[]) {
 
     struct timespec start={0,0}, end={0,0};
     clock_gettime(CLOCK_MONOTONIC, &start);
+    pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
     write_file(iv);
 
-    module* previous = iv;
-    do {
-        iv = iv->previous;
-        switch (iv->kind) {
-            case 'A':
-                free(previous);
-                previous = iv;
-        }
-    }while (previous->x != 1);
-    free(previous);
+    /* module* previous = iv; */
+    /* do { */
+    /*     iv = iv->previous; */
+    /*     switch (iv->kind) { */
+    /*         case 'A': */
+    /*             free(previous); */
+    /*             previous = iv; */
+    /*     } */
+    /* }while (previous->x != 1); */
+    /* free(previous); */
     free(pre_allocation);
     gsl_rng_free(rand_src);
     /* } */
