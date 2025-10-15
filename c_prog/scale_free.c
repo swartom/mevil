@@ -117,9 +117,11 @@ int main(int argc, char *argv[]) {
     wrapper.m = iv;
     wrapper.r = rand_src;
 
+    pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
+
     struct timespec start={0,0}, end={0,0};
     clock_gettime(CLOCK_MONOTONIC, &start);
-    pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
+
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
