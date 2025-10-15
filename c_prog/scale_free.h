@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define MAX 250000000
+#define MAX 1000000
 #define DIVISOR 2
-#define CONNECTIONS 4
+#define CONNECTIONS 60
 #define THREADS 128  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
 #define LIMIT MAX/THREADS
 

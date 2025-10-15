@@ -121,7 +121,6 @@ int main(int argc, char *argv[]) {
 
     struct timespec start={0,0}, end={0,0};
     clock_gettime(CLOCK_MONOTONIC, &start);
-
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
