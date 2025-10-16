@@ -10,7 +10,7 @@ from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
 G = nx.read_adjlist("c_prog/graph.adjlist")
 
 g = G.to_undirected()
-# print(f'{((len(g.edges)/10)/(float(l[0])/10**9))/10**6:.2f}m/PE/s')
+print(g)
 
 degree_sequence = sorted((d for n, d in g.degree()), reverse=True)
 dmax = max(degree_sequence)
@@ -29,7 +29,7 @@ ax2 = fig.add_subplot(1,1,1)
 degree_freq = nx.degree_histogram(g)
 degrees = range(len(degree_freq))
 
-ax2.loglog(degrees, degree_freq,c="green",marker=".",ms=2.5,mew=.2,lw =0.0, label=f'p=0.75')
+ax2.loglog(degrees, degree_freq,c="red",marker=".",ms=2.5,mew=.2,lw =0.0, label=f'p=0.75')
 # axins.loglog(degrees, degree_freq,c="#B4111B",marker=".",ms=2.5,mew=.2,lw =.5, label=f'p=0.75')
 
 # G = nx.read_adjlist("test.adjlist")

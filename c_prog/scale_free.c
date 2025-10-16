@@ -35,6 +35,7 @@ void* rule( void* p) {
     // NOTES This MUST be the first element of the memory allocation block otherwise
     // WE CANNOT identify the start of the memory block to free later on...
     #define A_r elements[0]
+
     A_r.kind = 'A';
     A_r.x = M->x;
     A_r.y = ((M->y) - (M->x))/DIVISOR + M->x; // r-1
@@ -44,14 +45,22 @@ void* rule( void* p) {
     M->x = A_r.y + 1;
 
     {
-        INTEGER_TYPE last = A_r.y;
-        double source = gsl_ran_beta(R, ALPHA, BETA);
-        INTEGER_TYPE max = A_r.y + 1;
+        /* double source = gsl_ran_beta(R, ALPHA, BETA); */
+
+        double source = gsl_ran_gamma(R, 20.0,1.0);
+
+        INTEGER_TYPE x = (A_r.y)*source;
+        INTEGER_TYPE c = x > 1 ? x : 1;
+
         for(int i =1; i < CONNECTIONS+1; i++) {
+            /* source = gsl_ran_beta(R, ALPHA, BETA); */
+            /* elements[i].x = source * A_r.y ; // Because we add one to the */
             elements[i].kind = 'L';
-            elements[i].x = (INTEGER_TYPE)( source * last +1) % max + 1;
+
+            x = (INTEGER_TYPE)((1)*x + c) % (A_r.y);
             elements[i].previous = &elements[i-1];
-        }
+            elements[i].x = x + 1; // Because we add one to the
+         }
     }
 
     #define check_M if (M->x != M->y) rule(p);
@@ -132,7 +141,7 @@ int main(int argc, char *argv[]) {
     total += times[i];
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
-    /* write_file(iv); */
+    write_file(iv);
 
     /* module* previous = iv; */
     /* do { */
