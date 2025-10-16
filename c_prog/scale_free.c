@@ -22,18 +22,12 @@ module* pre_allocation;
 void* rule( void* p) {
     #define M ((w *)p)->m
     #define R ((w *)p)->r
-    // Memory of the particular block in memory, excuse the pun
-    // struct parametric_module* end_of_block_pointer = m->previous;
     /* switch (m->kind) { */
     /*     case 'A': */
     // int r = ((m->y) - (m->x))/DIVISOR + m->x + 1; // Defining this here requires a memory call.
     module* elements = (module*) &pre_allocation[(CONNECTIONS + 1)*( ((M->y) - (M->x))/DIVISOR + M->x - 1)];
     /* module* elements = (module *)malloc((CONNECTIONS + 1)*sizeof(module)); */
 
-    /* printf("%d",(CONNECTIONS + 1)*( ((M->y) - (M->x))/DIVISOR + M->x - 1)); */
-    // ASSIGN the last element in the list
-    // NOTES This MUST be the first element of the memory allocation block otherwise
-    // WE CANNOT identify the start of the memory block to free later on...
     #define A_r elements[0]
 
     A_r.kind = 'A';
@@ -52,8 +46,6 @@ void* rule( void* p) {
         INTEGER_TYPE c = x > 1 ? x : 1;
 
         for(int i =1; i < CONNECTIONS+1; i++) {
-            /* source = gsl_ran_beta(R, ALPHA, BETA); */
-            /* elements[i].x = source * A_r.y ; // Because we add one to the */
             elements[i].kind = 'L';
 
             x = (INTEGER_TYPE)((1)*x + c) % (A_r.y);
