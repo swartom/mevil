@@ -106,8 +106,6 @@ int main(int argc, char *argv[]) {
     double total = 0.0;
     double* times = alloca(REPETITIONS*sizeof(double));
     for(int i = 0; i < REPETITIONS; i ++){
-
-
     gsl_rng *rand_src;
     rand_src = gsl_rng_alloc (gsl_rng_taus);
     INTEGER_TYPE max = MAX;
@@ -145,6 +143,7 @@ int main(int argc, char *argv[]) {
     /* }while (previous->x != 1); */
     /* free(previous); */
     free(pre_allocation);
+    free(iv);
     gsl_rng_free(rand_src);
     }
     double average = total/(double)(REPETITIONS);
