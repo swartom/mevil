@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     total += times[i];
     printf("%.10fs\n",((end.tv_sec + 1.0e-9*end.tv_nsec) - (start.tv_sec + 1.0e-9*start.tv_nsec)));
 
-    write_file(iv);
+    /* write_file(iv); */
 
     /* module* previous = iv; */
     /* do { */
@@ -153,6 +153,7 @@ int main(int argc, char *argv[]) {
         sum += pow(times[i] -average,2);
     double variance = sum/REPETITIONS;
     double std_deviation = sqrt(variance);
+    printf("Edges: %dx10**8\n",(INTEGER_TYPE)MAX*CONNECTIONS/(INTEGER_TYPE)pow(10,8));
     printf("Average over %d : %.10fs : stdv: %.3f\%\n", (int)REPETITIONS, average,(std_deviation/average)*100);
     printf("%.2fmE/PE/s",(((double)(MAX*CONNECTIONS)/1000000)/PROCESSORS)/average);
     return 1;

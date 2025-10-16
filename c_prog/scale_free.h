@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define MAX 100000
+#define MAX 10000000
 #define DIVISOR 2
-#define CONNECTIONS 6
-#define THREADS 32  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
+#define CONNECTIONS 30
+#define THREADS 128  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
 #define LIMIT MAX/THREADS
 #define REPETITIONS 1
 #define SECONDS_WAIT_BETWEEN_REPEATS 0
