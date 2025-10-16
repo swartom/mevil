@@ -44,12 +44,14 @@ void* rule( void* p) {
     M->x = A_r.y + 1;
 
     {
-        /* INTEGER_TYPE values[CONNECTIONS]; */
-    for(int i =1; i < CONNECTIONS+1; i++) {
-        elements[i].kind = 'L';
-        elements[i].x = (INTEGER_TYPE)(gsl_ran_beta(R, ALPHA, BETA) * (double)(A_r.y + 1)) + 1;
-        elements[i].previous = &elements[i-1];
-    }
+        INTEGER_TYPE last = A_r.y;
+        double source = gsl_ran_beta(R, ALPHA, BETA);
+        INTEGER_TYPE max = A_r.y + 1;
+        for(int i =1; i < CONNECTIONS+1; i++) {
+            elements[i].kind = 'L';
+            elements[i].x = (INTEGER_TYPE)( source * last +1) % max + 1;
+            elements[i].previous = &elements[i-1];
+        }
     }
 
     #define check_M if (M->x != M->y) rule(p);

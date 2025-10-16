@@ -3,14 +3,14 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
-l = list()
-for f in open("exec.txt"):
-    l.append(int(f.split(" ")[1]))
+# l = list()
+# for f in open("exec.txt"):
+#     l.append(int(f.split(" ")[1]))
 
 G = nx.read_adjlist("c_prog/graph.adjlist")
 
 g = G.to_undirected()
-print(f'{((len(g.edges)/10)/(float(l[0])/10**9))/10**6:.2f}m/PE/s')
+# print(f'{((len(g.edges)/10)/(float(l[0])/10**9))/10**6:.2f}m/PE/s')
 
 degree_sequence = sorted((d for n, d in g.degree()), reverse=True)
 dmax = max(degree_sequence)
