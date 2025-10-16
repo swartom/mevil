@@ -50,7 +50,7 @@ void* rule( void* p) {
 
             x = (INTEGER_TYPE)((1)*x + c) % (A_r.y);
             elements[i].previous = &elements[i-1];
-            elements[i].x = x + 1; // Because we add one to the
+            elements[i].x = x + 1; // Because we index vertices from 1 not 0
          }
     }
 
