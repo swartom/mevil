@@ -43,7 +43,7 @@ void* rule( void* p) {
         /* double source = gsl_ran_gamma(R, 20.0,1.0); */
 
         INTEGER_TYPE x = (A_r.y)*source;
-        INTEGER_TYPE c = x > 1 ? x : 1;
+        INTEGER_TYPE c = x > 1 ? x : 1; // This is only true if the vlaue of CONNECTIONS is greather than x
 
         for(int i =1; i < CONNECTIONS+1; i++) {
             elements[i].kind = 'L';
