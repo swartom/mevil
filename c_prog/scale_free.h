@@ -17,7 +17,7 @@
 #define REPETITIONS 1
 #define SECONDS_WAIT_BETWEEN_REPEATS 0
 
-#define PROCESSORS 32
+#define PROCESSORS 8
 
 #define ALPHA 0.5
 #define BETA 1.0
