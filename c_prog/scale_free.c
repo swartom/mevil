@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
         sum += pow(times[i] -average,2);
     double variance = sum/REPETITIONS;
     double std_deviation = sqrt(variance);
-    printf("Edges: %dx10**8\n",(INTEGER_TYPE)MAX*CONNECTIONS/(INTEGER_TYPE)pow(10,8));
+    printf("Edges: %d10\n",(MAX*CONNECTIONS));
     printf("Average over %d : %.10fs : stdv: %.3f\%\n", (int)REPETITIONS, average,(std_deviation/average)*100);
     printf("%.2fmE/PE/s",(((double)(MAX*CONNECTIONS)/1000000)/PROCESSORS)/average);
     return 1;

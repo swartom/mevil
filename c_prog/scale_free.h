@@ -14,12 +14,12 @@
 #define CONNECTIONS 24
 #define THREADS 128  // (uint32_t)sysconf(_SC_NPROCESSORS_ONLN) * 8
 #define LIMIT MAX/THREADS
-#define REPETITIONS 5
-#define SECONDS_WAIT_BETWEEN_REPEATS 4
+#define REPETITIONS 100
+#define SECONDS_WAIT_BETWEEN_REPEATS 5
 
 #define PROCESSORS 8
 
-#define ALPHA 0.25
+#define ALPHA 0.1
 #define BETA 1.0
 
 #endif // SCALE_FREE_H_2
