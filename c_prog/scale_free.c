@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <time.h>
 
-#define INTEGER_TYPE uint64_t
+
 
 typedef struct parametric_module {
     struct parametric_module * previous;
@@ -62,6 +62,7 @@ void* rule( void* p) {
         if((A_r.y)-(A_r.x) > LIMIT ){
             pthread_t thread;
             wrapper.r = gsl_rng_alloc (gsl_rng_taus);
+            gsl_rng_set(wrapper.r,SEED);
             pthread_create( &thread, NULL, rule, &wrapper);
             check_M
             pthread_join(thread,NULL);
@@ -108,6 +109,7 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < REPETITIONS; i ++){
     gsl_rng *rand_src;
     rand_src = gsl_rng_alloc (gsl_rng_taus);
+
     INTEGER_TYPE max = MAX;
     module* iv = (module*)malloc(sizeof(module));
     iv->kind = 'A';
@@ -118,11 +120,13 @@ int main(int argc, char *argv[]) {
 
     wrapper.m = iv;
     wrapper.r = rand_src;
+    gsl_rng_set(wrapper.r,SEED);
 
     pre_allocation = (module *)malloc((CONNECTIONS + 1)*sizeof(module)*MAX);
     
     struct timespec start={0,0}, end={0,0};
     sleep(SECONDS_WAIT_BETWEEN_REPEATS);
+
     clock_gettime(CLOCK_MONOTONIC, &start);
     rule(&wrapper);
     clock_gettime(CLOCK_MONOTONIC, &end);
