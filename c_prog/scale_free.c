@@ -45,9 +45,8 @@ void* rule( void* p) {
     M->x = A_r.y + 1;
 
     {
-        /* double source = gsl_ran_beta(R, ALPHA, BETA); */
-
-        double source = gsl_ran_gamma(R, 20.0,1.0);
+        double source = gsl_ran_beta(R, ALPHA, BETA);
+        /* double source = gsl_ran_gamma(R, 20.0,1.0); */
 
         INTEGER_TYPE x = (A_r.y)*source;
         INTEGER_TYPE c = x > 1 ? x : 1;
