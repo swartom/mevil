@@ -6,11 +6,18 @@
 
 
 typedef struct parametric_module {
-    struct parametric_module * previous;
+    void * previous;
     uint8_t kind;
     INTEGER_TYPE x;
     INTEGER_TYPE y;
 } module;
+
+
+typedef struct thin_parametric_module {
+    void * previous;
+    uint8_t kind;
+    INTEGER_TYPE x;
+} thin_module;
 
 typedef struct wrapper {
     module* m;

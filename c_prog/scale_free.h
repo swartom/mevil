@@ -18,7 +18,7 @@
 #define SECONDS_WAIT_BETWEEN_REPEATS 2
 
 // System Info
-#define PROCESSORS 8
+#define PROCESSORS 6
 #define INTEGER_TYPE uint64_t
 #define SEED 150
 
