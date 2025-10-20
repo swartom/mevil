@@ -24,7 +24,7 @@ typedef struct wrapper {
     gsl_rng* r;
 } w;
 
-module* pre_allocation;
+module* restrict pre_allocation;
 
 void* rule( void* p) {
     #define M ((w *)p)->m
